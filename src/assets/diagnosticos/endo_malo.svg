@@ -1,0 +1,12 @@
+<svg width="35" height="35" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <pattern id="hatchEndo" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="10" stroke="#3b82f6" stroke-width="3" />
+        </pattern>
+    </defs>
+
+    <path fill="url(#hatchEndo)"
+          stroke="#3b82f6"
+          stroke-width="1.5"
+          d="M62,10 C64,10 65,11 66,15 L67,25 C68,35 70,55 70,65 C70,80 63,90 50,90 C37,90 30,80 30,65 L31,55 C32,40 33,25 34,15 C35,11 36,10 38,10 C40,10 41,11 41,14 L42,20 L43,40 C43,55 45,65 50,65 C55,65 57,55 57,40 L58,20 L59,14 C59,11 60,10 62,10 Z" />
+</svg>

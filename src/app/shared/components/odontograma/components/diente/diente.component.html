@@ -1,0 +1,93 @@
+<div class="diente-container" [class.superior]="esSuperior">
+
+  @if (!esSuperior) {
+    <ng-container *ngTemplateOutlet="carasTemplate"></ng-container>
+  }
+
+  <div class="anatomy-box"
+       [class.is-selected]="estaSiendoEditado()"
+       (click)="toggleDienteCompleto()">
+
+    <img [src]="getImagenUrl()"
+         [alt]="'Pieza ' + numero"
+         class="tooth-image"
+         [class.mirror]="esIzquierdo"
+         [class.opacity-0]="estado?.ausente">
+
+         @for (h of estado?.hallazgos || []; track h.id) {
+          <div class="absolute inset-x-0 flex justify-center pointer-events-none"
+               [style.top]="posiciones[h.id]">
+
+            @if (h.id !== 'ausente') {
+              <img [src]="'assets/diagnosticos/' + h.icon"
+                   class="w-[30px] h-[30px] object-contain">
+            }
+
+            @if (h.id === 'ausente') {
+              <img src="assets/diagnosticos/ausente.svg"
+                   class="w-[35px] h-[35px] object-contain">
+            }
+          </div>
+        }
+
+    @if (estaSiendoEditado()) {
+      <div class="selection-overlay animate-in zoom-in-95"></div>
+    }
+  </div>
+
+  @if (esSuperior) {
+    <ng-container *ngTemplateOutlet="carasTemplate"></ng-container>
+  }
+
+  <span class="tooth-number">{{ (numero) }}</span>
+</div>
+
+<ng-template #carasTemplate>
+  <div class="faces-wrapper">
+    <svg viewBox="0 0 100 100" class="faces-svg">
+      @if (tieneCorona()) {
+        <g id="diagnostico-corona">
+          <circle
+            cx="50"
+            cy="50"
+            r="45"
+            class="corona-circle-shape" />
+        </g>
+      }
+      <path d="M0 0 L100 0 L50 50 Z"
+            (click)="toggleCara('v', $event)"
+            [class.active]="caras()['v']"
+            class="face-path" >
+            <title>Vestibular</title>
+          </path>
+
+      <path d="M0 100 L100 100 L50 50 Z"
+            (click)="toggleCara('l', $event)"
+            [class.active]="caras()['l']"
+            class="face-path" >
+            <title>"Lingual / Palatina"</title>
+          </path>
+
+      <path d="M0 0 L0 100 L50 50 Z"
+            (click)="toggleCara('m', $event)"
+            [class.active]="caras()['m']"
+            class="face-path" >
+            <title>{{ esIzquierdo ? 'Mesial' : 'Distal' }}</title>
+          </path>
+
+      <path d="M100 0 L100 100 L50 50 Z"
+            (click)="toggleCara('d', $event)"
+            [class.active]="caras()['d']"
+            class="face-path" >
+            <title>{{ esIzquierdo ? 'Distal' : 'Mesial' }}</title>
+            </path>
+
+      <circle cx="50" cy="50" r="22"
+              (click)="toggleCara('o', $event)"
+              [class.active]="caras()['o']"
+              class="face-path oclusal" >
+              <title>Oclusal</title>
+            </circle>
+    </svg>
+  </div>
+</ng-template>

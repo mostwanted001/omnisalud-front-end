@@ -1,0 +1,13 @@
+<svg width="45" height="130" viewBox="0 0 45 130" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="grad_diente_22" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#F1F5F9;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    <g transform="translate(41, 3) scale(-1, 1)" fill-rule="nonzero" stroke="#9F9F9F" stroke-width="0.9" stroke-linejoin="round">
+        <path d="M25.01,124.06 C34.61,123.16 35.91,120.06 36.21,118.06 C36.51,116.06 31.41,69.66 31.61,54.66 C31.81,39.66 28.61,16.26 28.51,15.76 C28.41,15.26 23.61,-3.74 15.91,0.66 C12.41,3.66 18.51,5.26 16.81,18.66 C15.11,32.06 10.91,38.46 10.31,52.46 C9.71,66.46 6.71,87.16 3.31,96.36 C-0.09,105.56 -0.19,104.86 0.11,107.46 C0.41,110.06 -1.59,120.76 25.01,124.06 Z"
+              fill="url(#grad_diente_22)"/>
+        <path d="M7.51,80.36 C10.31,79.26 12.91,77.26 15.91,76.66 C18.21,76.26 20.81,76.56 23.21,76.56 C26.61,76.46 30.21,77.56 32.91,79.56" fill="none"/>
+    </g>
+</svg>

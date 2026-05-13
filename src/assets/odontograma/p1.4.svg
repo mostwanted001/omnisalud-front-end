@@ -1,0 +1,19 @@
+<svg width="50" height="130" viewBox="0 0 50 130" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="grad_diente_14" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#F1F5F9;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    <g transform="translate(4, 3)" fill-rule="nonzero" stroke="#9F9F9F" stroke-width="0.9" stroke-linejoin="round">
+        
+        <path d="M14.23,30.7 C14.23,30.7 12.03,13 12.83,10.1 C13.63,7.2 15.73,1 17.93,1.2 L20.13,1.4" 
+              fill="url(#grad_diente_14)"/>
+        
+        <path d="M21.93,123.4 C26.53,123.5 42.83,111.6 42.73,102.5 C42.73,102.5 34.13,82.4 33.23,78.5 C32.33,74.6 28.63,59.9 28.33,38.4 C28.03,16.9 28.13,4.8 28.13,4.8 C28.13,4.8 28.13,0 23.53,0 C18.93,0 19.43,5.4 19.43,5.4 C19.43,5.4 14.93,22.4 12.63,44.2 C10.33,66 8.23,80.4 8.03,82 C7.83,83.6 -0.57,99.5 0.03,103.9 C0.53,108.1 11.23,123.1 21.93,123.4 Z" 
+              fill="url(#grad_diente_14)"/>
+        
+        <path d="M7.53,82.9 C13.33,80 19.13,78.4 25.63,79.7 C28.73,80.3 32.13,80.9 34.63,83.1" 
+              fill="none"/>
+    </g>
+</svg>

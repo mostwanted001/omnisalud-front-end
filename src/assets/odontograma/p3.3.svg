@@ -1,0 +1,16 @@
+<svg width="60" height="150" viewBox="0 0 60 150" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="grad_diente_33" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#F1F5F9;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    <g transform="translate(10, 5)" fill-rule="nonzero" stroke="#9F9F9F" stroke-width="0.9" stroke-linejoin="round">
+        
+        <path d="M37.6,22.5 C37.6,40.5 29.9,45 28.7,48.4 C27.6,51.8 27.8,62.3 27.8,66.2 C27.8,70.1 23.9,100.6 23,104.1 C22.1,107.6 23,130 23,130 C23,130 22.4,135 19.8,136 C17.2,137 15.6,131.8 15.6,131.8 C15.6,131.8 10,112.4 8.3,104.2 C6.6,96 9.1,55.6 9.1,48.5 C9.1,41.4 0,32.3 0,17.1 C0,8 12.9,0.6 16,0.6 C19.1,0.6 37.6,10.2 37.6,22.5 L37.6,22.5 Z" 
+              fill="url(#grad_diente_33)"/>
+        
+        <path d="M28.9,23.3048497 C23.8,25.9048497 17.7,27.5048497 12.2,24.8048497 C11.1,24.3048497 10.2,23.5048497 9.2,22.8048497" 
+              fill="none"/>
+    </g>
+</svg>

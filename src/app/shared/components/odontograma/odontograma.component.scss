@@ -1,0 +1,415 @@
+.odontograma-wrapper {
+  // Cambiamos p-8 por p-4 para ganar espacio lateral y eliminamos el scroll forzado
+  @apply flex flex-col items-center w-full overflow-hidden;
+  justify-content: center;
+
+  .header-odontograma {
+    @apply mb-8 flex flex-col items-center; // Reducimos margen de 12 a 8
+    h2 { @apply text-2xl font-black text-slate-800 tracking-tighter uppercase italic; }
+    .text-primary { @apply text-blue-600; }
+  }
+
+  /* Contenedor individual de cada diente */
+.cuadrante {
+  display: flex;
+  align-items: flex-end; /* Importante: Alinea las piezas superiores por la corona */
+}
+
+.cuadrante.inferior {
+  align-items: flex-start; /* Importante: Alinea las piezas inferiores por la corona */
+}
+
+/* Forzamos que cada "app-diente" o el contenedor del template tenga un ancho fijo */
+::ng-deep .diente-celda {
+  width: 48px;  /* Ajusta este valor según tu diseño (entre 45px y 55px) */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+  .cuadrantes-container {
+    display: flex;       // Cambiamos grid por flex para un control de centrado total
+    justify-content: center;
+    align-items: center;
+    gap: 2.5rem;              // Espacio cero entre cuadrantes centrales
+    width: fit-content;  // El contenedor solo ocupa lo que miden los dientes
+    margin: 0 auto;
+  }
+
+  /* Celda para piezas temporales */
+.diente-celda.temporal {
+  width: 42px; /* Un poco más estrecha que la permanente (que era ~50px) */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+/* Reducción de tamaño del SVG sin romper el layout */
+.diente-celda.temporal ng-container {
+  display: block;
+  transform: scale(0.85); /* Escala para que se vean como dientes de niño */
+  transform-origin: center;
+}
+
+/* Reflejo horizontal para los cuadrantes izquierdos temporales (6 y 7) */
+.cuadrante.izquierda.temporal ng-container {
+  transform: scale(-0.85, 0.85); /* Combinamos el reflejo con la escala */
+}
+
+/* Ajuste de etiquetas para niños */
+.diente-celda.temporal .tooth-label {
+  @apply text-[9px] font-bold text-blue-400 mb-1; /* Color azul suave para diferenciar */
+}
+
+  // Soporte para Dentición Temporal (Centrado y Compacto)
+  &.is-temporal {
+    .cuadrantes-container {
+      max-width: 650px; // Más estrecho para que los 5 dientes se vean juntos
+      gap: 0.25rem;
+    }
+    .diente-unit { transform: scale(0.9); }
+    .numero-diente { @apply text-blue-500; }
+  }
+
+  .cuadrante {
+    @apply flex items-center transition-all;
+  gap: 2px; // Solo el espacio mínimo entre dientes
+  padding: 0; // Eliminamos paddings que separan los cuadrantes
+
+  &.superior { @apply  pb-2; }
+  &.inferior { @apply  pt-2; }
+
+  &.derecha {
+    @apply justify-end;
+    border-r: none; // ELIMINADO: Quitamos la línea punteada central
+    padding-right: 1px; // Espacio mínimo para que no se toquen los bordes de la caja
+  }
+
+  &.izquierda {
+    @apply justify-start;
+    padding-left: 1px; // Espacio mínimo
+  }
+}
+
+  .diente-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 auto; // Permite que el diente se encoja si no hay espacio
+    max-width: 50px; // Reducimos de 55px a 50px
+    min-width: 32px; // Límite para que no colapse
+
+    .numero-diente {
+      @apply text-[9px] font-bold text-slate-400 uppercase tracking-tighter;
+    }
+
+
+    img {
+      @apply w-full h-auto object-contain z-10 transition-all duration-300;
+      max-height: 80px;
+
+      // Filtro inicial limpio
+      filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0));
+
+      &.mirror-image {
+        transform: scaleX(-1); // Invierte la imagen horizontalmente
+      }
+
+    }
+
+    // Cuando el diente está seleccionado
+    &.is-active-tooth {
+      img {
+        // Creamos el resplandor celeste siguiendo la forma del diente
+        filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.65));
+
+        // Un pequeño aumento para dar feedback de selección
+        transform: scale(1.08);
+
+        &.mirror-image {
+          transform: scaleX(-1) scale(1.1);
+        }
+      }
+    }
+
+
+    .tooth-container {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+
+
+    .diente-box {
+      position: relative;
+      width: 1.8rem;    // Reducimos de 2.25rem a 1.8rem (aprox 28px)
+      height: 1.8rem;
+      @apply border border-slate-200 bg-white shadow-inner rounded-sm overflow-hidden z-20;
+
+
+      .cara {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+
+        /* CRÍTICO: Esto hace que el mouse ignore el área transparente del div */
+        pointer-events: auto;
+
+        @apply bg-white border border-slate-100 transition-all duration-200;
+
+        // Aseguramos que el hover solo ocurra DENTRO del polígono
+        &:hover {
+          @apply brightness-90 z-50; // El z-50 asegura que la cara que tocas "salte" arriba
+        }
+
+        // Polígonos exactos (Asegúrate de que tengan el mismo nombre que usas en el TS)
+        &.mesial {
+          clip-path: polygon(0% 0%, 0% 100%, 50% 50%);
+        }
+
+        &.distal {
+          clip-path: polygon(100% 0%, 100% 100%, 50% 50%);
+        }
+
+        &.vestibular { clip-path: polygon(0% 0%, 100% 0%, 50% 50%); }
+        &.lingual    { clip-path: polygon(0% 100%, 100% 100%, 50% 50%); }
+
+        &.oclusal {
+          width: 40%; height: 40%; top: 30%; left: 30%;
+          z-index: 60; // Siempre arriba para que no lo tapen las caras laterales
+          clip-path: none;
+        }
+
+        &.C {
+          background-color: #dbeafe !important; /* Rojo de acción */
+          border-color: #dbeafe !important;
+          z-index: 50 !important; /* Asegura que la cara marcada esté sobre las demás */
+
+          // Sombra interna para darle profundidad clínica
+          box-shadow: inset 0 0 10px rgba(0,0,0,0.15);
+
+          // Animación opcional para que el dentista sepa que está activa
+          animation: mark-pulse 2s infinite;
+        }
+
+      }
+    }
+
+
+  }
+
+  @media (max-width: 1366px) {
+    .odontograma-wrapper {
+      transform: scale(0.9); // Encoge todo el componente un 10%
+      transform-origin: top center;
+    }
+  }
+
+
+
+}
+
+.legend-group {
+  .legend-item {
+    .legend-text {
+      display: block; // CRÍTICO: permite animar el ancho
+      max-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      color: #000000; // Un gris slate-500 visible
+      @apply text-[11px] font-bold uppercase tracking-tight transition-all duration-500 ease-in-out;
+    }
+  }
+
+  // Al pasar el mouse por la sección
+  &:hover {
+    .legend-text {
+      max-width: 100px !important;  // Valor fijo para forzar la expansión
+      margin-left: 8px; // Separación del cuadro de color
+      transition: max-width 0.5s ease-in-out, opacity 0.3s ease-in-out 0.1s;
+      opacity: 1; // Asegura que el texto sea visible al expandirse
+    }
+  }
+}
+
+table {
+  th {
+    // Asegura que los headers no se muevan
+    white-space: nowrap;
+    border-right: 1px solid rgba(241, 245, 249, 0.5);
+    &:last-child { border-right: none; }
+  }
+
+  td {
+    vertical-align: middle;
+  }
+}
+
+// Estilo para el hover de las filas
+tbody tr:hover {
+  @apply shadow-[inset_4px_0_0_0_#3b82f6]; // Línea azul a la izquierda en el hover
+}
+
+
+.legend-pill {
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  background: white;
+  border-radius: 9999px;
+  max-width: 32px; // Solo el ancho del círculo inicialmente
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    max-width: 140px; // Se abre hacia la derecha
+    padding-right: 16px;
+    border-color: #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+  }
+
+  .color-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0; // Evita que el círculo se aplaste al cerrar
+    transition: transform 0.3s ease;
+  }
+
+  &:hover .color-dot {
+    transform: scale(0.9);
+  }
+
+  .legend-label {
+    margin-left: 10px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap; // Evita que el texto salte de línea al abrirse
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.4s ease;
+  }
+
+  &:hover .legend-label {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+.sextante-shape {
+  stroke: #696969; // Tu color original exacto
+  stroke-width: 1.8;
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  transition: all 0.2s ease;
+}
+
+.sextante-btn {
+  background: white;
+  border: 1px solid transparent;
+  border-radius: 1.25rem;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: #f1f5f9;
+    .sextante-shape { stroke: #334155; stroke-width: 2.2; }
+  }
+
+  &.is-active {
+    background: #f0f7ff;
+    border-color: #3b82f6;
+
+    .sextante-shape {
+      stroke: #2563eb; // Azul para resaltar la selección
+      stroke-width: 3;
+      filter: drop-shadow(0 0 2px rgba(37, 99, 235, 0.2));
+    }
+
+    .label {
+      color: #1d4ed8;
+      font-weight: 800;
+    }
+
+    // Las arcadas también cambian de color
+    path {
+      color: #2563eb;
+    }
+  }
+}
+
+.label {
+  margin-top: 8px;
+  font-size: 10px;
+  color: #475569;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+
+// Animación de entrada para el Drawer
+.animate-in {
+  animation-fill-mode: forwards;
+}
+
+.slide-in-from-bottom {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+  }
+}
+
+.diag-overlay {
+  // Asegura que no se corte por el overflow-hidden del padre
+  max-width: 100% !important;
+  max-height: 80px !important;
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.1));
+}
+
+.base-tooth {
+  // El diente es pequeño y sutil en el borde inferior
+  max-height: 80px !important;
+  max-width: 50px !important;
+  z-index: 1;
+}
+
+button:hover {
+  .base-tooth {
+    filter: grayscale(0%) brightness(1); // El diente toma color al pasar el mouse
+  }
+}

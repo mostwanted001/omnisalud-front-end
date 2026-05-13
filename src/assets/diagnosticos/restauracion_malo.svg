@@ -1,0 +1,13 @@
+<svg width="35" height="35" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <pattern id="hatchRedRest" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="8" stroke="#3b82f6" stroke-width="2" />
+        </pattern>
+    </defs>
+
+    <path fill="url(#hatchRedRest)"
+          stroke="#3b82f6"
+          stroke-width="1.5"
+          transform="translate(25, 25) scale(2.2)"
+          d="M9.057,0.598 C5.953,-0.070 2.499,0.778 0.935,3.607 C-0.629,6.440 -0.109,9.437 1.595,11.738 C0.730,14.431 0.936,17.221 2.643,19.758 C4.020,21.805 6.796,23.404 9.848,23.875 C13.930,24.505 18.836,22.760 20.071,18.335 C24.670,17.974 25.479,9.763 21.172,8.143 C21.543,6.145 21.136,2.114 17.841,0.598 C15.645,-0.412 13.317,-0.142 10.859,1.406 C10.097,0.962 9.496,0.693 9.057,0.598 Z" />
+</svg>

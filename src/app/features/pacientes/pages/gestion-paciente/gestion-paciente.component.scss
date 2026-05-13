@@ -1,0 +1,48 @@
+.nav-link {
+  @apply flex items-center p-4 rounded-2xl text-slate-400 transition-all duration-300 hover:bg-slate-50;
+
+  &.active-nav {
+    @apply bg-blue-50 text-blue-600 shadow-sm;
+
+  }
+}
+
+
+button.text-emerald-600 {
+  @apply font-black;
+  position: relative;
+
+  &::after {
+    content: '';
+    @apply absolute right-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-emerald-500 rounded-full;
+  }
+}
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.odontograma-container {
+  @apply w-full bg-white rounded-[3rem] p-12 border border-slate-100 shadow-sm;
+  height: auto;       // Se ajusta al contenido
+  overflow: visible;  // No atrapa el scroll
+
+  .cuadrantes-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;  // Permite que si la pantalla es muy chica, bajen los cuadrantes
+    gap: 40px;        // Espacio entre superior e inferior
+    min-height: 600px;
+    justify-content: center; // Altura mínima para que no se vea "aplastado"
+  }
+}
+
+.cuadrante {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; // Alinea los dientes por la base
+  gap: 2px;
+
+  // Quitamos cualquier altura fija aquí para que el scroll lo mande el componente padre
+}
