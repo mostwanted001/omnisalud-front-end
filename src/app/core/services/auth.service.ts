@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class AuthService {
   private router = inject(Router);
 
   // URL de tu NestJS (ajusta según tu environment)
-  private apiUrl = 'http://localhost:3000/api/v1/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
 
   // Signal para manejar el estado global del usuario
   public currentUser = signal<any>(null);
