@@ -1,0 +1,755 @@
+@if (loading()) {
+  <div class="h-64 flex items-center justify-center text-slate-400 font-medium">
+    <span class="animate-spin mr-2">⌛</span> Cargando instrumental clínico...
+  </div>
+} @else {
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start animate-in fade-in duration-200 relative">
+
+    <div class="lg:col-span-2 flex flex-col gap-4">
+
+      <div class="bg-gradient-to-b from-sky-500 to-sky-600 text-white rounded-xl p-5 shadow-sm relative overflow-hidden">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <div class="text-[10px] uppercase font-black tracking-wider text-sky-100">Plan de tratamiento</div>
+            <h4 class="text-base font-bold flex items-center gap-1">
+              #{{ tratamiento()?.id?.toString()?.slice(-4) || '4025' }} 📄
+            </h4>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 mt-6">
+          <h3 class="text-xl font-black tracking-tight capitalize select-none">
+            {{ tratamiento()?.items?.[0]?.descripcion || 'Tratamiento Inicial' }}
+          </h3>
+          <span class="text-sky-200 text-xs cursor-pointer hover:text-white transition-colors">✏️</span>
+        </div>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm text-slate-600 text-xs font-semibold space-y-4">
+
+        <div class="text-center py-2">
+          <div class="text-slate-400 text-[11px] font-medium">Presupuesto total</div>
+          <div class="text-3xl font-black text-sky-600 mt-0.5">
+            ${{ (totalPresupuesto()) | number:'1.0-0' }}
+          </div>
+        </div>
+
+        <div class="border-t border-slate-100 pt-3 flex justify-between items-center">
+          <span class="text-slate-400 font-medium">Descuento comercial</span>
+          <span class="font-bold text-slate-800 flex items-center gap-1">
+            0% <span class="text-[10px] text-slate-400 cursor-pointer hover:text-slate-600">✏️</span>
+          </span>
+        </div>
+
+        <div class="space-y-2 text-[11px] bg-slate-50 p-3 rounded-lg border border-slate-100 font-medium">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Realizado</span>
+            <span class="text-slate-700">$0</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Abonado</span>
+            <span class="text-slate-700">$0</span>
+          </div>
+
+          <div class="flex justify-between font-bold text-slate-800 border-t border-slate-200/60 pt-1.5 mt-1">
+            <span class="text-slate-500">Saldo por abonar</span>
+            <span>${{ (totalPresupuesto()) | number:'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 text-center py-2 rounded-lg text-slate-400 font-bold tracking-wide border border-slate-200 flex justify-between px-3 text-[11px]">
+          <span class="font-medium text-slate-400">No hay abonos</span>
+          <span class="text-slate-600">$0</span>
+        </div>
+
+        <div class="border-t border-slate-100 pt-3 space-y-3 text-[11px] font-medium">
+          <div class="flex items-start gap-2.5">
+            <span class="text-slate-400 text-sm mt-0.5">👤</span>
+            <div>
+              <div class="text-slate-400 text-[9px] font-bold uppercase tracking-wider">Profesional a cargo</div>
+              <div class="text-sky-600 font-bold hover:underline cursor-pointer">Dr(a). Pamela Rodriguez</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-2.5">
+            <span class="text-slate-400 text-sm mt-0.5">📁</span>
+            <div>
+              <div class="text-slate-400 text-[9px] font-bold uppercase tracking-wider">Convenio</div>
+              <div class="text-slate-700 font-bold">Sin convenio</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-2.5">
+            <span class="text-slate-400 text-sm mt-0.5">🏢</span>
+            <div>
+              <div class="text-slate-400 text-[9px] font-bold uppercase tracking-wider">Sucursal</div>
+              <div class="text-slate-500 font-bold uppercase text-[10px] tracking-tight">GLOW ODONTOLOGÍA Y ESTÉTICA</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="lg:col-span-10 bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col ">
+
+      <div class="border-b border-slate-200 flex flex-wrap justify-between items-center gap-2 text-xs font-bold text-slate-500 mb-4">
+        <div class="flex items-center gap-1">
+          <button class="border-b-2 border-slate-800 text-slate-800 px-3 py-2 -mb-px">Odontograma</button>
+          <button class="px-3 py-2 text-slate-400 hover:text-slate-600">Fotografías del paciente</button>
+        </div>
+        <div class="flex items-center gap-3 text-slate-400 font-medium pb-1">
+          <button class="hover:text-slate-600">$ <span>▼</span></button>
+          <button class="hover:text-slate-600">⚙️ <span>▼</span></button>
+          <button class="hover:text-slate-600">🖨️ <span>▼</span></button>
+          <button class="hover:text-slate-600">🚀 <span>▼</span></button>
+        </div>
+      </div>
+
+      <div class="py-4 bg-white px-2 w-full overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+
+        <!-- Contenedor interno con ancho mínimo para asegurar que el FDI se vea perfecto -->
+        <div class=" p-1">
+          @if (renderizarOdontograma()) {
+          <app-odontograma
+            [isEditable]="true"
+            [odontogramaData]="tratamiento()?.odontogramaRaw"
+            (piezaModificada)="onDienteCambio($event)">
+          </app-odontograma>
+          }
+        </div>
+
+      </div>
+
+      <div class="border border-slate-100 rounded-xl bg-white shadow-sm mt-4">
+
+        <div class="border-b border-slate-100 pt-3 pb-3 px-4 flex flex-wrap items-center gap-2 text-xs font-bold text-slate-400 bg-slate-50/50 select-none">
+
+          <div class="flex items-center gap-2">
+            <button type="button" class="border border-sky-500 text-sky-600 hover:bg-sky-50 bg-white px-3 py-1.5 rounded-lg flex items-center gap-1 font-bold transition-colors">
+              <span class="text-sm font-light">+</span> Sección
+            </button>
+
+            @if (!isDrawerAbierto()) {
+              <button (click)="agregarPrestacion()" type="button" class="border border-emerald-500 text-emerald-600 hover:bg-emerald-50 bg-white px-3 py-1.5 rounded-lg flex items-center gap-1 font-bold transition-colors">
+                <span class="text-sm font-light">+</span> Prestación
+              </button>
+            }
+
+            <button type="button" class="border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 px-3 py-1.5 rounded-lg flex items-center gap-1 font-bold transition-colors">
+              Acciones <span class="text-[8px] text-slate-400 mt-0.5">▼</span>
+            </button>
+          </div>
+
+          <div class="ml-auto flex gap-12 text-[10px] tracking-wider uppercase font-black text-slate-400 pr-[1.75rem]">
+            <span class="w-10 text-center tracking-normal">Pieza</span>
+            <span class="w-10 text-center tracking-normal">Dscto</span>
+            <span class="w-14 text-right tracking-normal">Precio</span>
+            <span class="w-14 text-center tracking-normal">Pago</span>
+          </div>
+
+        </div>
+
+        <div cdkDropList
+             (cdkDropListDropped)="onFilaDroppeada($event)"
+             class="divide-y divide-slate-100 max-h-[440px] overflow-y-visible">
+
+          @for (item of prestacionesSeleccionadas(); track item.id) {
+
+            <div cdkDrag
+                 [class.relative]="dropdownAbiertoId() === item.id"
+                 [class.z-50]="dropdownAbiertoId() === item.id"
+                 class="bg-white last:border-b-0">
+
+              <div class="bg-slate-50/80 border-dashed border-2 border-slate-200 h-full w-full" *cdkDragPlaceholder></div>
+
+              <div class="px-4 py-3 flex items-center justify-between hover:bg-slate-50/40 transition-colors bg-white">
+
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+
+                  <div cdkDragHandle
+                       class="text-slate-300 font-mono text-sm tracking-tighter cursor-grab active:cursor-grabbing select-none px-1 py-0.5 hover:text-slate-500 transition-colors rounded hover:bg-slate-100"
+                       title="Arrastrar para reordenar">
+                    ⁝⁝
+                  </div>
+
+                  <div class="relative flex-shrink-0 group/grafico" >
+                    <div (click)="toggleDropdownGrafico(item.id, $event)"
+                         class="w-7 h-7 flex items-center justify-center cursor-pointer rounded-full hover:scale-105 active:scale-95 transition-all relative z-10"
+                         [title]="'Cambiar estado de avance: ' + (item.porcentajeCompletacion || 0) + '%'">
+                         @if (item.porcentajeCompletacion === 100) {
+                          <div class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[11px] font-black shadow-sm transform hover:scale-105 active:scale-95 transition-transform">
+                            ✓
+                          </div>
+                        } @else {
+                          <svg class="w-full h-full transform -rotate-90 hover:scale-105 active:scale-95 transition-transform" viewBox="0 0 36 36">
+                            <path class="text-slate-200" stroke="currentColor" stroke-width="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            <path class="text-sky-600 transition-all duration-300 ease-out"
+                                  stroke="currentColor"
+                                  stroke-width="4"
+                                  stroke-linecap="round"
+                                  fill="none"
+                                  [style.strokeDasharray]="item.porcentajeCompletacion + ', 100'"
+                                  [ngClass]="{ 'group-hover/grafico:stroke-[25_100] group-hover/grafico:text-sky-400/70': item.porcentajeCompletacion === 0 }"
+                                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                          </svg>
+                          <div class="absolute w-2 h-2 rounded-full bg-slate-100"></div>
+                        }
+                    </div>
+
+                    @if (dropdownAbiertoId() === item.id) {
+                      <div class="fixed inset-0 z-30 cursor-default" (click)="toggleDropdownGrafico(item.id, $event)"></div>
+
+                      <div class="absolute left-0 mt-1 w-52 bg-white rounded-md shadow-2xl border border-slate-200 py-1 z-40 animate-in fade-in zoom-in-95 duration-100 text-left text-xs text-slate-700 font-medium normal-case">
+                        <button (click)="cambiarPorcentajeAvance(item.id, 100, $event)" type="button" class="w-full px-4 py-2.5 text-left hover:bg-slate-50 transition-colors border-b border-slate-100/70 font-semibold text-slate-800">
+                          Realizar (100%)
+                        </button>
+                        <button (click)="cambiarPorcentajeAvance(item.id, 75, $event)" type="button" class="w-full px-4 py-2 hover:bg-slate-50 transition-colors text-center">75%</button>
+                        <button (click)="cambiarPorcentajeAvance(item.id, 50, $event)" type="button" class="w-full px-4 py-2 hover:bg-slate-50 transition-colors text-center">50%</button>
+                        <button (click)="cambiarPorcentajeAvance(item.id, 25, $event)" type="button" class="w-full px-4 py-2 hover:bg-slate-50 transition-colors text-center">25%</button>
+                        <button (click)="cambiarPorcentajeAvance(item.id, 0, $event)" type="button" class="w-full px-4 py-2 hover:bg-slate-50 transition-colors text-center border-b border-slate-100/70">0%</button>
+                        <button type="button" class="w-full px-4 py-2.5 text-left text-[11px] text-slate-500 hover:bg-slate-50 transition-colors font-medium">
+                          Seleccionar múltiples prestaciones
+                        </button>
+                      </div>
+                    }
+                  </div>
+
+                  <span (click)="toggleExpasionFila(item.id)"
+                        class="text-xs font-bold text-slate-700 uppercase tracking-tight truncate flex-1 cursor-pointer select-none">
+                    {{ item.nombre }}
+                  </span>
+
+                </div>
+
+                <div (click)="toggleExpasionFila(item.id)"
+                     class="ml-auto flex gap-12 items-center text-xs font-bold text-slate-700 pr-6 cursor-pointer select-none">
+
+                  <div class="w-10 flex justify-center items-center">
+                    <div class="relative w-8 h-8 flex items-center justify-center text-slate-300">
+                      <svg class="absolute inset-0 w-full h-full text-slate-200" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g transform="translate(0,-1036.3622)"><path style="stroke: currentColor; stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round;" fill="rgba(248, 250, 252, 0.4)" d="m 8.333666,1039.3391 c 0,0 3.390029,-3.203 5.65488,0.2162 2.264861,3.4193 -2.134185,11.3533 -2.644927,11.3066 -0.418954,0.019 -1.7987116,-2.4308 -3.009953,-2.4358 -1.2112423,0.028 -3.0488521,2.7168 -3.5279515,2.3888 -0.4791092,-0.3278 -4.22483862,-6.9791 -3.1795171,-10.0707 1.0453217,-3.0913 3.9634986,-3.7942 6.7074686,-1.4052 z"/></g>
+                      </svg>
+                      <span class="relative z-10 text-[9px] font-black text-slate-500 mt-1 tracking-tighter">{{ item.pieza }}</span>
+                    </div>
+                  </div>
+
+                  <span class="w-10 text-center font-bold text-slate-500">{{ item.descuento }}%</span>
+                  <span class="w-14 text-right tracking-tight font-black text-slate-700">${{ item.precio | number:'1.0-0' }}</span>
+
+                  <div class="w-14 flex items-center justify-end gap-4">
+
+                    <i (click)="toggleFuturaRealizacion(item.id, $event)"
+                        class="fa fa-shopping-cart text-sm cursor-pointer transition-colors select-none"
+                      [ngClass]="item.futuraRealizacion ? 'text-emerald-500 font-bold' : 'text-slate-300 hover:text-slate-400'">
+                    </i>
+
+                    <button (click)="toggleExpasionFila(item.id)" type="button" class="w-4 h-4 rounded-full bg-[#b83227] hover:bg-red-700 transition-all flex-shrink-0 cursor-pointer transform active:scale-90 shadow-sm"></button>
+                  </div>
+                </div>
+
+              </div>
+
+              @if (filaExpandidaId() === item.id) {
+                <div class="bg-[#f4f8fc] border-t border-slate-100 px-12 py-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
+
+                  <div class="flex items-center gap-6 text-xs font-bold text-slate-400/90 select-none">
+                    <button type="button" class="hover:text-slate-600 transition-colors flex items-center gap-1.5">
+                      <span>🔄</span> Desrealizar
+                    </button>
+                    <button type="button" class="hover:text-slate-600 transition-colors flex items-center gap-1.5">
+                      <span>↩️</span> Desasociar pago
+                    </button>
+                    <button type="button" class="hover:text-slate-600 transition-colors flex items-center gap-1.5">
+                      <span>💵</span> Abonar
+                    </button>
+
+                    <button
+                            type="button"
+                            class="ml-auto text-[#b83227] hover:text-red-700 transition-colors flex items-center gap-1.5">
+                      <span>🗑️</span> Eliminar
+                    </button>
+                  </div>
+
+                  <div class="flex items-center gap-4 pt-2 border-t border-slate-200/50">
+                    <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 text-xl flex-shrink-0 shadow-inner">
+                      👤
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-16 text-left flex-1">
+                      <div class="space-y-0.5">
+                        <div class="text-[9px] font-black uppercase text-slate-400 tracking-wider">Creado por</div>
+                        <div class="text-xs font-bold text-slate-600">Pamela Rodriguez</div>
+                        <div class="text-[10px] text-slate-400 font-semibold flex items-center gap-1">
+                          <span>📅</span> 6 de Junio, 2026
+                        </div>
+                      </div>
+
+                      <div class="space-y-0.5">
+                        <div class="text-[9px] font-black uppercase text-slate-400 tracking-wider">Realizado por</div>
+                        <div class="text-xs font-medium text-slate-500 italic">
+                          Esta prestación aún no ha sido realizada
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              }
+
+            </div>
+
+          }
+
+          @if (prestacionesSeleccionadas().length === 0) {
+            <div class="p-10 text-center text-slate-400 text-xs font-medium normal-case bg-white">
+              🫙 No hay prestaciones cargadas en este plan de tratamiento.
+            </div>
+          }
+
+        </div>
+
+      </div>
+
+
+      <div class="mt-3 relative border border-slate-100 rounded-xl overflow-hidden">
+
+        @if (prestacionesSeleccionadas().length === 0 && !isDrawerAbierto()) {
+          <div class="p-8 flex flex-col items-center justify-center min-h-[220px] bg-slate-50/40 relative animate-in fade-in duration-200">
+
+            <div class="w-full space-y-4 opacity-25 select-none pointer-events-none absolute inset-x-0 top-4 px-4">
+              <div class="flex justify-between items-center"><div class="h-4 bg-slate-200 rounded w-1/3"></div><div class="h-4 bg-slate-200 rounded w-1/12"></div></div>
+              <div class="flex justify-between items-center"><div class="h-4 bg-slate-200 rounded w-1/2"></div><div class="h-4 bg-slate-200 rounded w-1/12"></div></div>
+              <div class="flex justify-between items-center"><div class="h-4 bg-slate-200 rounded w-1/4"></div><div class="h-4 bg-slate-200 rounded w-1/12"></div></div>
+            </div>
+
+            <button (click)="agregarPrestacion()" type="button" class="bg-white border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 px-6 py-3 rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2 z-10 transform active:scale-95">
+              <span class="text-lg font-black">+</span> Agregar prestación
+            </button>
+
+          </div>
+        }
+        @else {
+          <div class="divide-y divide-slate-100 bg-white text-xs">
+            @for (item of tratamiento()?.items; track item.id) {
+              <div class="p-4 flex items-center justify-between hover:bg-slate-50/40 transition-colors font-medium text-slate-700">
+                <div class="flex items-center gap-3">
+                  <span class="w-2 h-2 rounded-full" [ngClass]="item.estado === 'PAGADO' ? 'bg-emerald-400' : 'bg-amber-400'"></span>
+                  <div class="space-y-0.5">
+                    <div class="font-bold text-slate-800 capitalize">{{ item.nombre || item.descripcion }}</div>
+                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-tight">
+                      Código: {{ item.codigo || '—' }} | Categoría: {{ item.categoria || 'Operatoria' }}
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-12 text-slate-600 text-[11px] font-bold pr-2">
+                  <span class="w-10 text-center text-sky-600 font-black">{{ item.pieza || '—' }}</span>
+                  <span class="w-10 text-center text-slate-400">{{ item.descuento || 0 }}%</span>
+                  <span class="w-14 text-right text-slate-900 font-extrabold">${{ item.precioUnitario | number:'1.0-0' }}</span>
+                  <span class="w-14 text-center">
+                    <span class="rounded text-[9px] px-1.5 py-0.5 font-black uppercase tracking-wider border"
+                          [ngClass]="{
+                            'bg-amber-50 border-amber-200 text-amber-600': item.estado === 'PENDIENTE',
+                            'bg-blue-50 border-blue-200 text-blue-600': item.estado === 'ABONADO',
+                            'bg-emerald-50 border-emerald-200 text-emerald-600': item.estado === 'PAGADO'
+                          }">
+                      {{ item.estado || 'Pendiente' }}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+      <div class="space-y-4 mt-4 select-none">
+
+        <div class="border border-slate-100 rounded-xl bg-white shadow-sm p-5 text-left">
+          <div class="flex items-center gap-2 text-slate-700 font-semibold text-sm">
+            <span class="text-emerald-500 text-lg flex items-center justify-center bg-emerald-50 w-5 h-5 rounded-full">✓</span>
+            Firma del paciente
+          </div>
+
+          <div class="mt-4">
+            <h4 class="text-xs font-black text-slate-700 tracking-tight">Consentimientos</h4>
+            <p class="text-xs text-slate-400 font-medium mt-1.5 normal-case">
+              No hay consentimientos informados pendientes por firmar
+            </p>
+          </div>
+
+          <div class="flex justify-end pt-3 mt-2 border-t border-slate-50">
+            <button type="button" class="text-emerald-600 hover:text-emerald-700 text-xs font-bold flex items-center gap-1 transition-colors">
+              <span class="text-base font-light">+</span> Crear consentimiento
+            </button>
+          </div>
+        </div>
+
+        <div class="border border-slate-100 rounded-xl bg-white shadow-sm p-5 text-left">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-700">
+              Comentarios para el paciente
+              <span class="text-slate-400 text-[11px] font-medium normal-case ml-1">(Se incluirán en la impresión de presupuestos)</span>
+            </h3>
+            <button type="button" class="text-sky-600 hover:text-sky-700 text-xs font-bold flex items-center gap-1 transition-colors">
+              ✏️ Editar
+            </button>
+          </div>
+
+          <div class="py-6 text-center text-slate-400 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-50/50 rounded-lg transition-colors mt-2">
+            Sin comentario, presione para agregar un comentario <span>👆</span>
+          </div>
+        </div>
+
+        <div class="border border-slate-100 rounded-xl bg-white shadow-sm p-5 text-left">
+          <h3 class="text-sm font-bold text-slate-700">
+            Solicitudes de atención con otro profesional
+          </h3>
+
+          <div class="py-8 text-center text-slate-400 text-xs font-medium normal-case">
+            No se ha realizado ninguna solicitud para este tratamiento.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+}
+
+<div class="fixed right-2 top-1/2 -translate-y-1/2 flex flex-col gap-3.5 z-40 animate-in slide-in-from-right duration-300">
+  <button type="button" title="Recetas" class="w-11 h-11 rounded-full bg-[#008be2] hover:bg-sky-600 text-white flex items-center justify-center shadow-md hover:shadow-lg hover:-translate-x-1 transition-all group">
+    <span class="text-xl group-hover:scale-110 transition-transform">💊</span>
+  </button>
+  <button type="button" title="Documentos y Formularios" class="w-11 h-11 rounded-full bg-[#008be2] hover:bg-sky-600 text-white flex items-center justify-center shadow-md hover:shadow-lg hover:-translate-x-1 transition-all group">
+    <span class="text-xl group-hover:scale-110 transition-transform">📝</span>
+  </button>
+  <button type="button" title="Imágenes y Radiografías" class="w-11 h-11 rounded-full bg-[#008be2] hover:bg-sky-600 text-white flex items-center justify-center shadow-md hover:shadow-lg hover:-translate-x-1 transition-all group">
+    <span class="text-xl group-hover:scale-110 transition-transform">🖼️</span>
+  </button>
+  <button type="button" title="Periodontograma" class="w-11 h-11 rounded-full bg-[#008be2] hover:bg-sky-600 text-white flex items-center justify-center shadow-md hover:shadow-lg hover:-translate-x-1 transition-all group">
+    <span class="text-xl group-hover:scale-110 transition-transform">🦷</span>
+  </button>
+  <div class="relative group">
+    <button type="button" title="Antecedentes Médicos" class="w-11 h-11 rounded-full bg-[#008be2] hover:bg-sky-600 text-white flex items-center justify-center shadow-md hover:shadow-lg hover:-translate-x-1 transition-all">
+      <span class="text-xl group-hover:scale-110 transition-transform">❤️</span>
+    </button>
+    <span class="absolute -bottom-1 -left-1 bg-[#d90d19] text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow border-2 border-white select-none animate-bounce">10</span>
+  </div>
+  <button type="button" title="Historial de Evoluciones" class="w-11 h-11 rounded-full bg-[#008be2] hover:bg-sky-600 text-white flex items-center justify-center shadow-md hover:shadow-lg hover:-translate-x-1 transition-all group">
+    <span class="text-xl group-hover:scale-110 transition-transform">📋</span>
+  </button>
+</div>
+
+<div class="relative z-50" [class.hidden]="!isDrawerAbierto()">
+
+  <div (click)="cerrarDrawer()" class="fixed inset-0  animate-in fade-in duration-300"></div>
+
+  <div class="fixed inset-y-0 right-0 max-w-full flex pl-10 pointer-events-none">
+    <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col h-full transform transition-all animate-in slide-in-from-right duration-300 pointer-events-auto">
+
+      <div class="bg-[#d90d19] text-white px-4 py-3.5 flex justify-between items-center shadow-sm">
+        <div class="flex items-center gap-2 font-bold text-sm tracking-wide"><span>🏥</span> Definir procedimiento</div>
+        <button (click)="cerrarDrawer()" type="button" class="text-white/80 hover:text-white hover:scale-110 transition-all text-lg font-light p-1">✕</button>
+      </div>
+
+      <div class="p-3 border-b border-slate-100 bg-white sticky top-0 z-10 flex items-center gap-2">
+        <span class="text-slate-400 text-sm pl-1">🔍</span>
+        <input type="text" placeholder="Buscar categorías, prestaciones, plantillas..." class="w-full text-xs font-medium text-slate-600 placeholder-slate-400 outline-none border-none py-1" />
+      </div>
+
+      <div class="flex-1 overflow-y-auto divide-y divide-slate-100 text-slate-700 text-xs font-bold uppercase tracking-tight">
+
+        @if (vistaDrawer() === 'CATEGORIAS') {
+
+          @if (loadingAranceles()) {
+            <div class="p-4 space-y-4 animate-pulse">
+              <div class="h-10 bg-slate-100 rounded-lg w-full"></div>
+              <div class="h-10 bg-slate-100 rounded-lg w-full"></div>
+              <div class="h-10 bg-slate-100 rounded-lg w-full"></div>
+            </div>
+          } @else {
+            <div class="p-4 flex justify-between items-center hover:bg-slate-50 cursor-pointer transition-colors group">
+              <span class="text-slate-600 font-bold capitalize normal-case">Plantillas base</span>
+              <span class="text-slate-300 group-hover:text-slate-500">❯</span>
+            </div>
+
+            @for (categoria of categoriasArancel(); track categoria.id) {
+              <div (click)="seleccionarCategoria(categoria)"
+                   class="p-4 flex justify-between items-center hover:bg-sky-50/40 cursor-pointer transition-colors group border-l-2 border-transparent hover:border-sky-500">
+                <span class="text-slate-700 normal-case font-medium group-hover:text-sky-600 transition-colors">
+                  {{ categoria.nombre }}
+                </span>
+                <span class="text-slate-300 group-hover:text-sky-500 transform group-hover:translate-x-0.5 transition-all">❯</span>
+              </div>
+            }
+
+            @if (categoriasArancel().length === 0) {
+              <div class="p-8 text-center text-slate-400 font-medium normal-case">
+                ⚠️ No se encontraron categorías registradas.
+              </div>
+            }
+          }
+        }
+
+        @else if (vistaDrawer() === 'PRESTACIONES') {
+
+          <div (click)="regresarACategorias()"
+               class="p-3 bg-slate-50 flex items-center gap-2 text-sky-600 cursor-pointer hover:bg-sky-50/60 transition-colors border-b border-slate-100 sticky top-0 normal-case font-semibold text-[11px] z-10">
+            <span>⬅️</span> Volver a categorías | <span class="text-slate-500 font-bold ml-1">{{ categoriaSeleccionada()?.nombre }}</span>
+          </div>
+
+          @if (loadingPrestaciones()) {
+            <div class="p-4 space-y-4 animate-pulse">
+              <div class="flex justify-between items-center"><div class="h-4 bg-slate-100 rounded w-2/3"></div><div class="h-4 bg-slate-100 rounded w-1/5"></div></div>
+              <div class="flex justify-between items-center"><div class="h-4 bg-slate-100 rounded w-1/2"></div><div class="h-4 bg-slate-100 rounded w-1/5"></div></div>
+            </div>
+          } @else {
+
+            @for (prestacion of prestacionesFiltradas(); track prestacion.id) {
+              <div (click)="marcarPrestacionFila(prestacion.id)"
+                   [ngClass]="{ 'bg-slate-50/80 border-emerald-500': prestacionSeleccionadaId() === prestacion.id }"
+                   class="p-4 flex justify-between items-center hover:bg-slate-50 cursor-pointer transition-all border-l-2 border-transparent group">
+
+                <div class="flex items-center gap-3">
+                  <span class="text-slate-400 text-sm">🖤</span>
+
+                  <div class="space-y-0.5 normal-case font-medium">
+                    <div class="text-slate-700 text-xs font-bold tracking-tight uppercase">
+                      {{ prestacion.nombre || prestacion.descripcion }}
+                    </div>
+                    <div class="text-[10px] text-slate-400 font-semibold tracking-normal lowercase first-letter:uppercase">
+                      {{ prestacion.codigo ? 'Código: ' + prestacion.codigo : 'procedimiento clínico' }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center">
+
+                  @if (prestacionSeleccionadaId() === prestacion.id) {
+                    <button (click)="cargarPrestacionAlPlan(prestacion, $event)"
+                            type="button"
+                            class="bg-[#72b963] hover:bg-[#61a253] text-white text-[11px] font-bold px-3 py-1.5 rounded flex items-center gap-1 shadow-sm transition-all transform active:scale-95 capitalize normal-case">
+                      <span class="text-xs font-light">+</span> Cargar
+                    </button>
+                  }
+                  @else {
+                    <span class="text-slate-300 group-hover:text-slate-500 transition-colors transform group-hover:translate-x-0.5 duration-200">
+                      ❯
+                    </span>
+                  }
+
+                </div>
+
+              </div>
+            }
+
+            @if (prestacionesFiltradas().length === 0) {
+              <div class="p-8 text-center text-slate-400 font-medium normal-case">
+                💡 No hay aranceles registrados en esta categoría.
+              </div>
+            }
+          }
+        }
+
+      </div>
+
+      <div class="bg-slate-50 border-t border-slate-200/60 p-4 text-center space-y-1 shadow-inner sticky bottom-0">
+        <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Piezas seleccionadas</div>
+        <div class="text-sm font-black text-sky-600 tracking-tight flex items-center justify-center gap-1">
+          <span>🦷</span> {{ piezaSeleccionadaDrawer() }}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+
+
+@if (isModalAbierto()) {
+  <div class="fixed inset-0 z-[60] flex items-center justify-center">
+
+    <div (click)="cerrarModalExtra()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-[1px] animate-in fade-in duration-200"></div>
+
+    <div class="bg-white rounded-md shadow-2xl w-full max-w-xl mx-4 overflow-hidden z-10 transform transition-all animate-in zoom-in-95 duration-200 flex flex-col">
+
+      <div class="px-6 py-4 border-b border-slate-100">
+        <h3 class="text-slate-800 text-lg font-bold tracking-tight">Información extra</h3>
+      </div>
+
+      <div class="p-6 space-y-5 text-left">
+
+        <div class="space-y-1">
+          <label class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Prestación</label>
+          <div class="text-xs font-bold text-slate-700 tracking-tight uppercase">
+            [] {{ prestacionEnConfiguracion()?.nombre }}
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Pieza afectada:</label>
+          <div class="text-sm font-bold text-slate-700 tracking-tight">
+            {{ seleccionActualPadre()?.pieza }}
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+            Seleccione un símbolo para esta prestación
+          </label>
+          <div class="relative">
+            <select
+              [(ngModel)]="simboloSeleccionadoId"
+              class="w-full border border-slate-300 rounded px-3 py-2 text-xs text-slate-600 bg-white outline-none focus:border-sky-500 font-medium appearance-none pr-8 cursor-pointer shadow-sm">
+              <option value="" disabled selected>Seleccione una opción</option>
+
+              <option value="caries">🛑 Caries o Lesión Activa</option>
+              <option value="corona">👑 Corona Clínica</option>
+              <option value="endodoncia">🌀 Endodoncia / Tratamiento de conducto</option>
+              <option value="implante">🔩 Implante Dental</option>
+              <option value="ausente">❌ Pieza Ausente / Extracción</option>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 text-[10px]">▼</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bg-slate-50 px-6 py-4 flex justify-end items-center gap-2 border-t border-slate-100">
+        <button
+          (click)="cerrarModalExtra()"
+          type="button"
+          class="px-4 py-2 bg-[#eaeaea] hover:bg-slate-200 text-slate-700 text-xs font-bold rounded transition-colors shadow-sm">
+          Cerrar
+        </button>
+        <button
+          (click)="confirmarYAgregarAlTratamiento()"
+          type="button"
+          class="px-4 py-2 bg-[#6cb45c] hover:bg-[#5aa14a] text-white text-xs font-bold rounded flex items-center gap-1 transition-colors shadow-sm">
+          + Cargar al tratamiento
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
+
+
+@if (isModalEvolucionAbierto()) {
+  <div class="fixed inset-0 z-[70] flex items-center justify-center">
+
+    <div (click)="cerrarModalEvolucion()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-[1px] animate-in fade-in duration-200"></div>
+
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl mx-4 overflow-hidden z-10 transform transition-all animate-in zoom-in-95 duration-200 flex flex-col">
+
+      <div class="px-6 pt-5 pb-3">
+        <h3 class="text-slate-800 text-lg font-bold tracking-tight">Nueva evolución</h3>
+        <p class="text-xs font-semibold text-slate-400 mt-0.5 normal-case">
+          Paciente: <span class="text-slate-500 font-bold">Alexis Enrique Rodriguez Aedo</span>
+        </p>
+      </div>
+
+      <div class="px-6 py-2 space-y-4 text-left">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="relative border border-slate-200 rounded-lg px-3 py-1.5 bg-white shadow-sm">
+            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wide">Profesional</label>
+            <select [(ngModel)]="evolucionProfesional" class="w-full text-xs font-semibold text-slate-700 bg-white outline-none border-none pt-0.5 appearance-none pr-6 cursor-pointer">
+              <option value="Pamela Rodríguez">Pamela Rodríguez</option>
+            </select>
+            <span class="absolute right-3 bottom-2.5 text-slate-400 text-[9px] pointer-events-none">▼</span>
+          </div>
+
+          <div class="relative border border-slate-200 rounded-lg px-3 py-1.5 bg-white shadow-sm">
+            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wide">Tratamiento</label>
+            <select [(ngModel)]="evolucionTratamiento" class="w-full text-xs font-semibold text-slate-700 bg-white outline-none border-none pt-0.5 appearance-none pr-6 cursor-pointer">
+              <option value="rehabilitacion">Rehabilitación</option>
+            </select>
+            <span class="absolute right-3 bottom-2.5 text-slate-400 text-[9px] pointer-events-none">▼</span>
+          </div>
+
+          <div class="relative border border-slate-200 rounded-lg px-3 py-1.5 bg-white shadow-sm">
+            <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wide">Fecha</label>
+            <div class="flex items-center gap-1.5 pt-0.5">
+              <span class="text-slate-400 text-xs">📅</span>
+              <input type="text" [(ngModel)]="evolucionFecha" class="w-full text-xs font-semibold text-slate-700 outline-none border-none p-0" />
+            </div>
+          </div>
+        </div>
+
+        <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm flex flex-col min-h-[200px]">
+          <div class="bg-slate-50 border-b border-slate-200/80 px-3 py-2 flex items-center justify-between flex-wrap gap-2 select-none">
+            <div class="flex items-center gap-4 text-xs text-slate-500 font-bold">
+              <div class="flex items-center gap-1 cursor-pointer hover:text-slate-800"><span>Párrafo</span> <span class="text-[7px]">▼</span></div>
+              <div class="w-px h-4 bg-slate-300"></div>
+              <button type="button" class="font-bold hover:text-slate-800">B</button>
+              <button type="button" class="italic hover:text-slate-800">I</button>
+              <button type="button" class="underline hover:text-slate-800">U</button>
+              <button type="button" class="line-through hover:text-slate-800">S</button>
+              <div class="w-px h-4 bg-slate-300"></div>
+              <div class="flex items-center gap-1 cursor-pointer hover:text-slate-800"><span>📋</span> <span class="text-[7px]">▼</span></div>
+              <div class="flex items-center gap-1 cursor-pointer hover:text-slate-800"><span>🔢</span> <span class="text-[7px]">▼</span></div>
+            </div>
+
+            <button type="button" class="bg-slate-800 hover:bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded flex items-center gap-1 transition-colors">
+              <span class="text-xs font-light">+</span> Usar plantilla
+            </button>
+          </div>
+
+          <textarea
+            [(ngModel)]="evolucionTexto"
+            placeholder="Escribe o dicta la evolución"
+            class="w-full flex-1 p-4 text-xs font-medium text-slate-600 placeholder-slate-400 outline-none resize-none min-h-[150px]">
+          </textarea>
+        </div>
+
+      </div>
+
+      <div class="bg-slate-50 px-6 py-4 flex justify-between items-center border-t border-slate-100 mt-2">
+
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <div class="relative">
+            <input type="checkbox" [(ngModel)]="isEvolucionPrivada" class="sr-only peer" />
+            <div class="w-8 h-4 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-sky-500"></div>
+          </div>
+          <span class="text-[11px] font-bold text-slate-500 flex items-center gap-1 normal-case">
+            Evolución privada <span class="text-slate-300 text-xs">🛈</span>
+          </span>
+        </label>
+
+        <div class="flex items-center gap-2">
+          <button
+            (click)="cerrarModalEvolucion()"
+            type="button"
+            class="px-4 py-2 text-slate-700 text-xs font-bold rounded hover:bg-slate-100 transition-colors">
+            Cerrar
+          </button>
+          <button
+            (click)="guardarEvolucionYProgreso()"
+            type="button"
+            class="px-5 py-2 bg-[#0074d9] hover:bg-[#0063b8] text-white text-xs font-bold rounded-lg transition-colors shadow-md normal-case tracking-tight">
+            Guardar avance ({{ evolucionCambioPendiente()?.nuevoPorcentaje }}%)
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+}
+
+@if (mostrarNotificacionFutura()) {
+  <div class="fixed bottom-4 left-4 z-[100] flex items-center gap-3 bg-[#f4f9f4] border border-emerald-200 text-emerald-800 text-xs font-bold px-4 py-3 rounded-lg shadow-lg animate-in slide-in-from-bottom-4 duration-300 max-w-sm">
+
+    <span class="tracking-tight normal-case font-medium text-slate-700">
+      {{ mensajeNotificacion() }}
+    </span>
+
+    <button (click)="mostrarNotificacionFutura.set(false)"
+            type="button"
+            class="w-4 h-4 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center text-[10px] font-black transition-colors ml-2">
+      ✕
+    </button>
+
+  </div>
+}

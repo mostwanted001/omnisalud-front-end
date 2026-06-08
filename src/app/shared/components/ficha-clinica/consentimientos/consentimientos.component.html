@@ -1,0 +1,75 @@
+<div class="space-y-6 animate-in fade-in duration-500">
+
+  <!-- 🔝 Cabecera Ajustada de Forma Idéntica a la Imagen -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-slate-100 gap-4">
+
+    <!-- Título Principal -->
+    <h2 class="text-xl font-normal text-slate-700 tracking-tight">Consentimiento informado</h2>
+
+    <!-- Controles de Acción a la Derecha -->
+    <div class="flex items-center gap-3 ml-auto w-full sm:w-auto justify-end">
+
+      <!-- Checkbox Mostrar anulados -->
+      <label class="flex items-center gap-2 bg-slate-100/80 hover:bg-slate-100 px-4 py-2.5 rounded-lg text-xs font-bold text-slate-600 cursor-pointer transition-all border border-transparent">
+        <input
+          type="checkbox"
+          [checked]="mostrarAnulados()"
+          (change)="mostrarAnulados.set(!mostrarAnulados())"
+          class="rounded text-blue-600 focus:ring-0 w-3.5 h-3.5 border-slate-300"
+        >
+        Mostrar anulados
+      </label>
+
+      <!-- Botón Nuevo Consentimiento Informado (Verde Corporativo) -->
+      <button
+        (click)="crearNuevoConsentimiento()"
+        type="button"
+        class="bg-[#5cb85c] hover:bg-emerald-600 text-white font-bold text-xs px-4 py-2.5 rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+      >
+        <span>📄</span> Nuevo consentimiento informado
+      </button>
+
+    </div>
+  </div>
+
+  <!-- 🗃️ Contenedor del Estado de la Lista -->
+  <div class="w-full">
+    @if (consentimientos().length === 0) {
+
+      <!-- Estado Vacío Calcado de la Imagen de Referencia -->
+      <div class="flex flex-col items-center justify-center py-28 text-slate-400/80">
+
+        <!-- Icono de Bandeja Gris Minimalista -->
+        <div class="w-16 h-12 border-4 border-slate-300 rounded-2xl relative flex items-center justify-center mb-5 before:content-[''] before:absolute before:bottom-0 before:w-10 before:h-2 before:bg-slate-300 before:rounded-t-sm">
+          <div class="absolute top-1 w-6 h-1 bg-slate-300 rounded-full"></div>
+        </div>
+
+        <!-- Texto Literal de la Captura -->
+        <p class="text-base font-medium tracking-wide text-slate-400/80 text-center px-4">
+          Este paciente no cuenta con ningún consentimiento informado creado en la plataforma.
+        </p>
+      </div>
+
+    } @else {
+
+      <!-- Listado de Consentimientos cuando existan registros -->
+      <div class="grid grid-cols-1 gap-3">
+        @for (con of consentimientos(); track con.id) {
+          @if (!con.anulado || mostrarAnulados()) {
+            <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm flex items-center justify-between group animate-in zoom-in-95 duration-150">
+              <div class="flex items-center gap-3">
+                <span class="text-xl">📄</span>
+                <div>
+                  <p class="text-xs font-bold text-slate-700">{{ con.titulo }}</p>
+                  <p class="text-[10px] font-medium text-slate-400 mt-0.5">Emitido el {{ con.fecha }}</p>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+    }
+  </div>
+
+</div>

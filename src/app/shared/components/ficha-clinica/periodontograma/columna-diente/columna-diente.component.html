@@ -1,0 +1,97 @@
+<div *ngIf="formGroupCita" [formGroup]="formGroupCita" class="w-full flex flex-col border-y border-r border-l border-slate-200 bg-white text-center text-xs select-none ">
+
+  <div class="bg-slate-50 font-black text-slate-700 border-b border-slate-200 text-[11px] italic h-9 flex items-center justify-center">
+    {{ numeroPieza }}
+  </div>
+
+  <div class="grid grid-cols-3 border-b border-slate-100 bg-white p-0.5 gap-0.5 h-9 items-center" [formArrayName]="cara === 'vestibular' ? 'ps_v' : 'ps_p'">
+    @for (i of sitios; track i) {
+      <input type="text" [formControlName]="i" maxlength="2"
+             [class.text-rose-600]="psArray.at(i).value >= 4"
+             [class.font-black]="psArray.at(i).value >= 4"
+             class="w-full text-center py-0.5 text-[10px] bg-slate-50 focus:bg-blue-50 focus:outline-none border border-transparent focus:border-blue-300 rounded transition-colors" />
+    }
+  </div>
+
+  <div class="grid grid-cols-3 border-b border-slate-100 bg-white p-0.5 gap-0.5 h-9 items-center" [formArrayName]="cara === 'vestibular' ? 'mg_v' : 'mg_p'">
+    @for (i of sitios; track i) {
+      <input type="text" [formControlName]="i" maxlength="2"
+             class="w-full text-center py-0.5 text-[10px] bg-white focus:bg-blue-50 focus:outline-none border border-transparent focus:border-blue-300 rounded text-slate-600 transition-colors" />
+    }
+  </div>
+
+  <div class="grid grid-cols-3 border-b border-slate-200 bg-slate-50 p-0.5 gap-0.5 font-bold h-9 items-center" [formArrayName]="cara === 'vestibular' ? 'nic_v' : 'nic_p'">
+    @for (i of sitios; track i) {
+      <div class="w-full text-center py-0.5 text-[10px] rounded transition-all duration-150"
+           [ngClass]="{
+             'text-rose-600 font-black scale-110': +nicArray.at(i).value >= 4,
+             'text-slate-500': +nicArray.at(i).value < 4 || !nicArray.at(i).value
+           }">
+        {{ nicArray.at(i).value !== '' ? nicArray.at(i).value : '-' }}
+      </div>
+    }
+  </div>
+
+  <div class="grid grid-cols-3 border-b border-slate-100 bg-white h-9 items-center">
+    <div class="col-span-3 flex justify-center items-center w-full h-full">
+
+      <button (click)="toggleFurcaEstado()" type="button"
+              class="flex items-center justify-center w-full h-full transition-all focus:outline-none cursor-pointer">
+
+        @if (formGroupCita.get('furca')?.value === 0 || !formGroupCita.get('furca')?.value) {
+          <span class="text-[9px] text-slate-200">•</span>
+        }
+
+        @if (formGroupCita.get('furca')?.value === 1) {
+          <div class="w-3.5 h-3.5 border border-slate-800 rounded-full bg-transparent"></div>
+        }
+
+        @if (formGroupCita.get('furca')?.value === 2) {
+          <div class="w-3.5 h-3.5 border border-slate-800 rounded-full overflow-hidden flex">
+            <div class="w-1/2 h-full bg-slate-800"></div>
+            <div class="w-1/2 h-full bg-transparent"></div>
+          </div>
+        }
+
+        @if (formGroupCita.get('furca')?.value === 3) {
+          <div class="w-3.5 h-3.5 bg-slate-800 border border-slate-800 rounded-full"></div>
+        }
+
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 border-b border-slate-100 bg-white h-10 items-center p-0.5 gap-0.5" formArrayName="exudado">
+    @for (i of sitios; track i) {
+      <button (click)="toggleIndicador('exudado', i)" type="button"
+              class="h-5 w-full rounded border border-slate-200 flex items-center justify-center transition-all focus:outline-none hover:bg-slate-50 cursor-pointer">
+
+        @if (exudadoArray.at(i).value) {
+          <i class="fa fa-tint text-amber-500 text-[10px]"></i>
+        }
+
+      </button>
+    }
+  </div>
+
+  <div class="grid grid-cols-3 border-b border-slate-200 bg-white h-10 items-center p-0.5 gap-0.5" formArrayName="sangramiento">
+    @for (i of sitios; track i) {
+      <button (click)="toggleIndicador('sangramiento', i)" type="button"
+              class="h-5 w-full rounded border border-slate-200 flex items-center justify-center transition-all focus:outline-none hover:bg-slate-50 cursor-pointer">
+
+        @if (sangramientoArray.at(i).value) {
+          <i class="fa fa-tint text-rose-600 text-[10px]"></i>
+        }
+
+      </button>
+    }
+  </div>
+
+  <div class="grid grid-cols-3 bg-white h-9 items-center p-0.5 gap-0.5">
+    <div class="col-start-2 flex justify-center">
+      <input type="text" formControlName="movilidad" maxlength="1"
+             class="w-full text-center text-[10px] font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded focus:outline-none focus:border-blue-400" />
+    </div>
+  </div>
+
+</div>

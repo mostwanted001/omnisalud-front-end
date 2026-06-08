@@ -80,32 +80,31 @@
           </div>
           }
 
-          <!-- 2. CAPA DE CITAS (ABSOLUTE) -->
           <!-- 2. CAPA DE CITAS (DENTRO DEL BUCLE DE DÍAS) -->
-@for (cita of getAtencionesPorDia(day); track cita.id) {
-  <div [ngStyle]="{'top': calcularTop(cita.fecha)}"
-    (click)="openCitaMenu($event, cita)"
-    class="absolute left-1 right-1 z-40 p-2 rounded bg-white border border-slate-200 shadow-md border-l-4 border-l-blue-600 transition-all hover:shadow-lg cursor-pointer group"
-    style="height: 38px; overflow: hidden;">
+          @for (cita of getAtencionesPorDia(day); track cita.id) {
+            <div [ngStyle]="{'top': getPosicionTop(cita.hora), 'height': getAlturaDinamica(cita.duracion)}"
+                (click)="openCitaMenu($event, cita)"
+                class="absolute left-0.5 right-0.5 z-40 p-1.5 rounded bg-white border border-slate-200 shadow-sm border-l-4 border-l-blue-600 transition-all hover:shadow-md cursor-pointer group overflow-hidden">
 
-    <div class="flex items-center justify-between h-full">
-      <div class="flex flex-col flex-1 overflow-hidden pointer-events-none">
-        <span class="text-[9px] font-black text-slate-800 truncate uppercase leading-none mb-0.5">
-          {{ cita.paciente.user.fullName }}
-        </span>
-        <span class="text-[8px] text-blue-600 font-bold truncate">
-          {{ cita.procedimiento }}
-        </span>
-      </div>
+                <div class="flex flex-col h-full justify-center">
+                  <div class="flex items-center justify-between overflow-hidden pointer-events-none">
+                    <span class="text-[10px] font-black text-slate-800 truncate uppercase leading-tight">
+                      {{ cita.paciente.user.fullName }}
+                    </span>
 
-      <!-- Botones de acción rápida -->
-      <div class="flex gap-1 ml-1 opacity-40 group-hover:opacity-100">
-        <i class="fa-solid fa-comment text-blue-400 text-[9px]"></i>
-        <i class="fa-solid fa-circle-chevron-down text-slate-400 text-[10px]"></i>
-      </div>
-    </div>
-  </div>
-  }
+                    <div class="flex gap-1 ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <i class="fa-solid fa-comment text-blue-400 text-[8px]"></i>
+                    </div>
+                  </div>
+
+                  @if (cita.duracion >= 30) {
+                    <span class="text-[9px] text-blue-600 font-bold truncate">
+                      {{ cita.hora }} - {{ cita.motivo || 'Consulta' }}
+                    </span>
+                  }
+                </div>
+            </div>
+            }
 
   <!-- MENÚ DE CITA EXISTENTE (AL FINAL DEL ARCHIVO) -->
   @if (activeCitaMenu(); as m) {

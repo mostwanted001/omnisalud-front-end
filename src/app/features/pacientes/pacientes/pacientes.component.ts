@@ -1,27 +1,30 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, HostListener, inject, OnInit, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PacientesService } from '../services/pacientes.service';
 import { Paciente } from '../../../core/models/atencion.model';
-import { OdontogramaComponent } from "../../../shared/components/odontograma/odontograma.component";
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pacientes',
   templateUrl: './pacientes.component.html',
   styleUrls: ['./pacientes.component.scss'],
-  imports: [CommonModule, FormsModule, OdontogramaComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   standalone: true
 })
 export class PacientesComponent implements OnInit {
   public pacientesService = inject(PacientesService);
   public openMenuId = signal<string | null>(null);
+  private location = inject(Location);
+
 
   private router = inject(Router);
 
   // Signal para controlar el paciente seleccionado en el modal
   public selectedPaciente = signal<Paciente | null>(null);
   public isFichaOpen = signal(false);
+  private fb = inject(FormBuilder);
+  public showModal = signal(false); // Manejo de estado con Signals
 
   public tabActiva = signal<string>('Datos personales');
   public subTabActiva = signal<string>('Historial');
@@ -37,31 +40,95 @@ export class PacientesComponent implements OnInit {
 
   selectedFiles = signal<any[]>([]);
   isUploading = signal(false);
+  listaPacientes = signal<any[]>([]); // Inicializado con los pacientes de la DB
 
-  opcionesDocumentos = [
-    'Certificado Médico',
-    'Informe de Alta',
-    'Presupuesto Detallado',
-    'Consentimiento Informado Especial'
-  ];
+  newPatient: any = {
+    fullName: '',        // Ya no están dentro de "user"
+    rut: '',
+    email: '',
+    fechaNacimiento: '',
+    sexo: '',
+    direccion: '',
+    comuna: 'Chillán',
+    ciudad: 'Chillán',
+    enfermedades: '',
+    alergias: '',
+    medicamentos: ''
+  };
 
-  showModalConsentimiento = signal(false);
-  nuevoConsentimiento = signal({
-  tipo: '',
-  planTratamiento: '',
-  profesional: 'Pamela Rodriguez' // Valor por defecto según captura
-});
 
+
+  savePatient() {
+    // Ya sabemos que this.newPatient debe ser plano (sin el objeto .user)
+    this.pacientesService.create(this.newPatient).subscribe({
+      next: (pacienteCreado: Paciente) => {
+        // 1. Actualizamos el signal del servicio
+        // Al actualizar 'pacientes', el 'filteredPacientes' se recalcula solo
+        this.pacientesService.addPaciente(pacienteCreado);
+        this.pacientesService.showSuccess('¡Paciente registrado con éxito!');
+
+
+
+        // 2. Limpieza de UI
+        this.closeModal();
+        this.resetNewPatient();
+        console.log('Paciente registrado y lista actualizada en QA');
+      },
+      error: (err) => {
+        console.error('Error al guardar en el servidor de Chillán:', err);
+      }
+    });
+  }
+
+
+  closeModal() {
+    this.showModal.set(false);
+    this.resetNewPatient();
+  }
+
+  openModal() {
+    this.resetNewPatient();
+    this.showModal.set(true);
+  }
+
+  private resetNewPatient() {
+    this.newPatient = {
+      fullName: '',
+      rut: '',
+      email: '',
+      phone: '', // Agrégalo aquí también para que el backend cree el usuario
+      fechaNacimiento: '',
+      sexo: 'FEMENINO',
+      direccion: '',
+      comuna: 'Chillán',
+      ciudad: 'Chillán',
+      enfermedades: '',
+      alergias: '',
+      medicamentos: ''
+    };
+  }
 
 
   ngOnInit() {
-    this.pacientesService.findAll();
+    this.loadPacientes();
   }
 
   onSearch(event: Event) {
     const value = (event.target as HTMLInputElement).value;
     this.pacientesService.filterQuery.set(value);
   }
+
+  loadPacientes() {
+    this.pacientesService.findAll().subscribe({
+      next: (data) => {
+        // Le inyectamos la data al Signal del servicio desde acá
+        this.pacientesService.pacientes.set(data);
+      },
+      error: (err) => console.error('Error en el componente al traer pacientes:', err)
+    })
+  }
+
+
 
   formatRut(rut: string): string {
     if (!rut) return '';
@@ -112,16 +179,26 @@ export class PacientesComponent implements OnInit {
   openFichaClinica(paciente: Paciente) {
     console.log('Abriendo ficha de:', paciente.user.fullName);
 
-    // 1. Cargamos los datos del paciente en el estado
+    // 1. Cargamos los datos del paciente en el estado global / señal del padre
     this.selectedPaciente.set(paciente);
 
-    // 2. Extraemos el ID del objeto paciente para la navegación
+    // 2. Extraemos el ID único para la navegación
     const id = paciente.id;
 
-    this.router.navigate(['/pacientes', id]);
+    // 3. Forzamos a que las señales del Sidebar se inicialicen apuntando a Datos Personales
+    this.tabActiva.set('Datos personales');
+    this.subTabActiva.set(''); // Limpiamos cualquier subtab clínica residual anterior
 
-    // Tip Senior: Si necesitas cargar datos extra (como el odontograma)
-    // este es el momento de llamar a tu TreatmentService
+    // 4. Navegamos al componente contenedor padre
+    this.router.navigate(['/pacientes', id]).then(() => {
+      // 5. Una vez que la navegación termina, reescribimos estéticamente la URL
+      // para que quede exactamente en la sub-rama administrativa fuera de la ficha
+      this.location.go(`/pacientes/${id}/gestion/personales`);
+    });
+
+    // Tip Senior: Si necesitas precargar el odontograma o periodontograma en segundo plano
+    // para que cuando el doctor pinche esas pestañas carguen instantáneamente, hazlo aquí:
+    // this.treatmentService.preloadOdontograma(id);
   }
 
   closeFicha() {
@@ -158,100 +235,18 @@ export class PacientesComponent implements OnInit {
   }
 
   // Función para transformar Date/ISO a YYYY-MM-DD
-formatDateForInput(date: string | Date | undefined): string {
-  if (!date) return '';
-  const d = new Date(date);
-  // Usamos el locale 'sv-SE' que devuelve YYYY-MM-DD de forma nativa
-  return d.toLocaleDateString('sv-SE');
-}
-
-// Función para capturar el cambio del input y devolverlo al modelo
-onDateChange(event: any, paciente: any) {
-  const newDate = event.target.value; // Viene como "1990-05-15"
-  paciente.fechaNacimiento = newDate ? new Date(newDate).toISOString() : null;
-}
-
-
-
-crearPlan() {
-  if (this.nombreNuevoPlan().length > 3) {
-    this.showModalNuevo.set(false);
-    this.viewMode.set('odontograma');
-    // Aquí podrías llamar a tu servicio para guardar el nombre inicial
+  formatDateForInput(date: string | Date | undefined): string {
+    if (!date) return '';
+    const d = new Date(date);
+    // Usamos el locale 'sv-SE' que devuelve YYYY-MM-DD de forma nativa
+    return d.toLocaleDateString('sv-SE');
   }
-}
 
-onFileSelected(event: any) {
-  const files: FileList = event.target.files;
-  if (!files || files.length === 0) return;
-
-  // Convertimos FileList a Array para manipularlo mejor
-  const filesArray = Array.from(files);
-
-  filesArray.forEach(file => {
-    // 1. Validar tamaño (ej: máximo 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      alert(`El archivo ${file.name} es muy pesado. Máximo 10MB.`);
-      return;
-    }
-
-    // 2. Crear previsualización si es imagen
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.selectedFiles.update(current => [
-        ...current,
-        {
-          file,
-          name: file.name,
-          type: file.type,
-          preview: file.type.startsWith('image') ? e.target.result : null,
-          progress: 0
-        }
-      ]);
-    };
-    reader.readAsDataURL(file);
-  });
-
-  // 3. Opcional: Iniciar subida automática o esperar a botón "Guardar"
-  // this.uploadFiles();
-}
-
-crearPrescripcion() {
-  const nuevaReceta = {
-    profesional: 'Dr(a). Pamela Rodriguez', // Podría venir de tu sesión
-    fecha: new Date(),
-    contenido: this.recetaTexto(),
-    tratamientoId: '#2353'
-  };
-  // Aquí llamarías a tu servicio de NestJS para guardar
-  console.log('Guardando receta:', nuevaReceta);
-}
-
-abrirModalDocumento() {
-  this.tipoDocumentoSeleccionado.set('');
-  this.showModalDocumento.set(true);
-}
-
-continuarCreacionDoc() {
-  if (this.tipoDocumentoSeleccionado()) {
-    console.log('Creando documento tipo:', this.tipoDocumentoSeleccionado());
-    this.showModalDocumento.set(false);
-    // Aquí podrías redirigir a un editor o abrir otro modal específico
+  // Función para capturar el cambio del input y devolverlo al modelo
+  onDateChange(event: any, paciente: any) {
+    const newDate = event.target.value; // Viene como "1990-05-15"
+    paciente.fechaNacimiento = newDate ? new Date(newDate).toISOString() : null;
   }
-}
-
-abrirModalConsentimiento() {
-  this.nuevoConsentimiento.set({ tipo: '', planTratamiento: '', profesional: 'Pamela Rodriguez' });
-  this.showModalConsentimiento.set(true);
-}
-
-crearConsentimiento() {
-  console.log('Generando documento:', this.nuevoConsentimiento());
-  this.showModalConsentimiento.set(false);
-  // Aquí lanzarías la generación del PDF o el editor de firma
-}
-
-
 
 
 }

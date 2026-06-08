@@ -41,19 +41,16 @@ export class LoginComponent {
       next: (res) => {
         this.isLoading.set(false);
 
-        // DEBUG: Para que veas en la consola qué está llegando
-        console.log('Respuesta del servidor:', res);
-
-        // 1. Extraemos los datos usando los nombres exactos del JSON
-        const role = res.user?.role || res.role; // Captura "ADMIN"
+        const role = res.user?.role || res.role;
         const name = res.user?.fullName || res.fullName;
 
-        // 2. Guardamos en LocalStorage
         localStorage.setItem('user_role', role);
         localStorage.setItem('user_name', name);
 
-        // 3. REDIRECCIÓN: Ajustamos la comparación a "ADMIN"
-        if (role === 'ADMIN' || role === 'ADMINISTRADOR') {
+        // REDIRECCIÓN INTELIGENTE:
+        if (role === 'SUPER_ADMIN') {
+          this.router.navigate(['/superadmin']); // 🚀 Aquí está el destino nuevo
+        } else if (role === 'ADMIN' || role === 'ADMINISTRADOR') {
           this.router.navigate(['/admin/stats']);
         } else {
           this.router.navigate(['/agenda']);
@@ -61,7 +58,6 @@ export class LoginComponent {
       },
       error: (err) => {
         this.isLoading.set(false);
-        // Si el servidor dio 200 pero entraste aquí, es un error de código en el 'next'
         this.errorMessage.set('Error al procesar el inicio de sesión.');
         console.error('Error:', err);
       }

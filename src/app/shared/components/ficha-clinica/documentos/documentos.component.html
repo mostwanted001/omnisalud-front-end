@@ -1,0 +1,149 @@
+<div class="space-y-6 animate-in fade-in duration-500">
+
+  <!-- 🔝 Cabecera Alineada Exactamente a la Captura -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-slate-100 gap-4">
+
+    <!-- Título Principal -->
+    <h2 class="text-xl font-normal text-slate-700 tracking-tight">Documentos clínicos</h2>
+
+    <!-- Controles de Acción a la Derecha -->
+    <div class="flex items-center gap-3 ml-auto w-full sm:w-auto justify-end">
+
+      <!-- Checkbox Ver anulados -->
+      <label class="flex items-center gap-2 bg-slate-100/80 hover:bg-slate-100 px-4 py-2.5 rounded-lg text-xs font-bold text-slate-600 cursor-pointer transition-all border border-transparent">
+        <input
+          type="checkbox"
+          [checked]="mostrarAnulados()"
+          (change)="mostrarAnulados.set(!mostrarAnulados())"
+          class="rounded text-blue-600 focus:ring-0 w-3.5 h-3.5 border-slate-300"
+        >
+        Ver anulados
+      </label>
+
+      <!-- Botón Nuevo Documento Clínico (Verde Calcado) -->
+      <button
+        (click)="abrirSelectorDocumento()"
+        type="button"
+        class="bg-[#5cb85c] hover:bg-emerald-600 text-white font-bold text-xs px-4 py-2.5 rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+      >
+        <span>📄</span> Nuevo documento clínico
+      </button>
+
+    </div>
+  </div>
+
+  <!-- 🗃️ Contenedor del Estado de la Lista -->
+  <div class="w-full">
+    @if (documentos().length === 0) {
+
+      <!-- Estado Vacío Calcado de la Imagen de Referencia -->
+      <div class="flex flex-col items-center justify-center py-28 text-slate-400/80">
+
+        <!-- Icono de Bandeja Gris Minimalista -->
+        <div class="w-16 h-12 border-4 border-slate-300 rounded-2xl relative flex items-center justify-center mb-5 before:content-[''] before:absolute before:bottom-0 before:w-10 before:h-2 before:bg-slate-300 before:rounded-t-sm">
+          <div class="absolute top-1 w-6 h-1 bg-slate-300 rounded-full"></div>
+        </div>
+
+        <!-- Texto Literal de la Captura -->
+        <p class="text-base font-medium tracking-wide text-slate-400/80 text-center px-4">
+          Este paciente no cuenta con ningún documento clínico
+        </p>
+      </div>
+
+    } @else {
+
+      <!-- Listado o Grilla de Documentos cuando la dentista suba archivos -->
+      <div class="grid grid-cols-1 gap-3">
+        @for (doc of documentos(); track doc.id) {
+          @if (!doc.anulado || mostrarAnulados()) {
+            <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm flex items-center justify-between group animate-in zoom-in-95 duration-150">
+              <div class="flex items-center gap-3">
+                <span class="text-xl">📄</span>
+                <div>
+                  <p class="text-xs font-bold text-slate-700">{{ doc.nombre }}</p>
+                  <p class="text-[10px] font-medium text-slate-400 mt-0.5">Subido por {{ doc.usuarioSubida }} el {{ doc.fecha }}</p>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+    }
+  </div>
+
+</div>
+
+<!-- 📥 MODAL DE NUEVO DOCUMENTO CLÍNICO (Calcado de la captura) -->
+@if (showModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+
+    <!-- Contenedor del Modal -->
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
+
+      <!-- Cuerpo del formulario interno -->
+      <div class="p-8 space-y-6">
+
+        <!-- Título principal -->
+        <h3 class="text-xl font-bold text-slate-800 tracking-tight">Nuevo documento clínico</h3>
+
+        <div class="space-y-2">
+          <!-- Label descriptivo -->
+          <label class="text-sm font-medium text-slate-700 block">
+            Seleccione el tipo de documento clínico que desea crear
+          </label>
+
+          <!-- Selector Dropdown -->
+          <div class="relative w-full">
+            <select
+              [(ngModel)]="tipoDocumentoSeleccionado"
+              class="w-full bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg px-4 py-3 appearance-none focus:outline-none focus:border-blue-400 cursor-pointer"
+            >
+              <option value="" disabled selected hidden></option>
+              <option value="Epicrisis">Epicrisis Clínica</option>
+              <option value="Informe">Informe Dental de Diagnóstico</option>
+              <option value="Certificado">Certificado de Alta Médica</option>
+            </select>
+            <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400 text-xs">
+              ▼
+            </div>
+          </div>
+        </div>
+
+        <!-- Párrafo Informativo con Enlace -->
+        <p class="text-sm text-slate-700 leading-relaxed">
+          Si desea diseñar un nuevo documento clínico, debe hacerlo desde la sección de
+          <a href="#" class="text-blue-500 hover:underline font-medium">administración</a>
+        </p>
+
+      </div>
+
+      <!-- Barra de Acciones Inferior -->
+      <div class="bg-slate-50/50 px-8 py-4 flex justify-end gap-3 border-t border-slate-100">
+
+        <!-- Botón Cerrar (Gris) -->
+        <button
+          (click)="cerrarModal()"
+          type="button"
+          class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold px-5 py-2.5 rounded-lg transition-all"
+        >
+          Cerrar
+        </button>
+
+        <!-- Botón Continuar (Azul Nativo #0070f3) -->
+        <button
+          (click)="procesarContinuar()"
+          type="button"
+          class="bg-[#0070f3] hover:bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm transition-all"
+        >
+          Continuar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+}
+
+

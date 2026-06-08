@@ -20,28 +20,21 @@
             "outputPath": "dist/glow-dental-dentist",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.scss"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.scss"],
             "scripts": []
           },
           "configurations": {
             "production": {
               "fileReplacements": [
-      {
-        "replace": "src/environments/environment.ts",
-        "with": "src/environments/environment.prod.ts"
-      }
-    ],
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",
@@ -56,13 +49,16 @@
               ],
               "outputHashing": "all"
             },
-            "development": {
+            "qa": {
               "fileReplacements": [
-      {
-        "replace": "src/environments/environment.ts",
-        "with": "src/environments/environment.development.ts"
-      }
-    ],
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.qa.ts"
+                }
+              ]
+            },
+            "development": {
+              "fileReplacements": [],
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
@@ -72,12 +68,18 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "glow-dental-dentist:build:production"
             },
             "development": {
               "buildTarget": "glow-dental-dentist:build:development"
+            },
+            "qa": {
+              "buildTarget": "glow-dental-dentist:build:qa"
             }
           },
           "defaultConfiguration": "development"
@@ -85,25 +87,18 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "glow-dental-dentist:build"
+            "buildTarget": "glow-dental-dentist:build",
+
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.scss"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.scss"],
             "scripts": []
           }
         }

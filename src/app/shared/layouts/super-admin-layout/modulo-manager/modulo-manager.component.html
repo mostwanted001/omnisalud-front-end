@@ -1,0 +1,44 @@
+<div class="p-8 space-y-8">
+  <div class="flex justify-between items-end border-b border-slate-800 pb-6">
+    <div>
+      <h2 class="text-3xl font-black text-black uppercase tracking-tighter">Módulo Manager</h2>
+      <p class="text-slate-500 text-sm font-bold uppercase tracking-widest mt-1">Configuración de Feature Flags por Clínica</p>
+    </div>
+    <div class="w-72">
+      <input type="text" (input)="onSearch($event)" placeholder="🔍 Buscar clínica..."
+             class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    @for (tenant of filteredTenants(); track tenant.id) {
+      <div class="space-y-4">
+        <h2 class="text-xl font-black text-black border-l-4 border-emerald-500 pl-3">{{ tenant.nombre }}</h2>
+
+        <div class="grid grid-cols-1 gap-4">
+          @for (modulo of ['dental', 'estetica', 'medica']; track modulo) {
+            <div class="relative p-4 rounded-xl border transition-all"
+                 [class.bg-emerald-900]="isModuleActive(tenant, modulo)"
+                 [class.bg-opacity-20]="isModuleActive(tenant, modulo)"
+                 [class.border-emerald-500]="isModuleActive(tenant, modulo)"
+                 [class.bg-slate-900]="!isModuleActive(tenant, modulo)"
+                 [class.border-slate-800]="true">
+
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-bold text-black uppercase">{{ modulo }} Core</span>
+                <button (click)="toggleModulo(tenant, modulo)"
+                        class="px-3 py-1 rounded-full text-[9px] font-black uppercase transition-all"
+                        [class.bg-emerald-500]="isModuleActive(tenant, modulo)"
+                        [class.bg-slate-800]="!isModuleActive(tenant, modulo)"
+                        [class.text-white]="isModuleActive(tenant, modulo)"
+                        [class.text-slate-500]="!isModuleActive(tenant, modulo)">
+                  {{ isModuleActive(tenant, modulo) ? 'ON' : 'OFF' }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,17 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box; /* Crucial para que el padding no sume ancho extra */
+
+  /* Mantiene el control asimétrico que viene desde el padre */
+  width: var(--diente-ancho);
+  min-width: var(--diente-ancho);
+  max-width: var(--diente-ancho);
+  flex-shrink: 0;
+  flex-grow: 0;
+  height: 100%;
+
+  /* Dejamos 2px libres a la izquierda y 2px a la derecha como canaleta de aire */
+  padding-left: 2px;
+  padding-right: 2px;
+}

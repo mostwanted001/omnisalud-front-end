@@ -16,6 +16,17 @@ export class WeeklyViewComponent implements OnInit {
 public activeMenu = signal<{ day: Date, interval: string, x: number, y: number } | null>(null);
 public activeCitaMenu = signal<{ cita: any, x: number, y: number } | null>(null);
 
+// 1. Define la altura de un bloque de 15 minutos en píxeles
+readonly DURACION_HEIGHTS: { [key: number]: number } = {
+  15: 79,
+  30: 116,
+  45: 157,
+  60: 200,
+  90: 276
+};
+readonly HORA_INICIO = 8; // Tu agenda empieza a las 08:00 AM
+
+
   public today = new Date();
 
   // Horas de 08:00 a 22:00
@@ -73,19 +84,16 @@ public activeCitaMenu = signal<{ cita: any, x: number, y: number } | null>(null)
     return date.getDay() === 0;
   }
 
-  // 3. Filtrado por día para el renderizado en la grilla
   getAtencionesPorDia(day: Date) {
-    // 1. Obtenemos el string YYYY-MM-DD del día de la grilla (local)
-    const y = day.getFullYear();
-    const m = (day.getMonth() + 1).toString().padStart(2, '0');
-    const d = day.getDate().toString().padStart(2, '0');
-    const fechaGrilla = `${y}-${m}-${d}`;
+    // Formato "YYYY-MM-DD" local de la columna de la agenda
+    const fechaGrilla = day.toLocaleDateString('sv-SE');
 
-    // 2. Filtramos asegurándonos de comparar manzanas con manzanas
     return this.atencionesService.atenciones().filter(cita => {
-      // Si cita.fecha es "2026-04-21T10:30:00.000Z", tomamos solo los primeros 10 caracteres
-      const fechaCita = cita.fecha.substring(0, 10);
-      return fechaCita === fechaGrilla;
+        // Extraemos solo la parte de la fecha del ISO que viene de Prisma
+        // cita.fecha es "2026-05-18T00:00:00.000Z" -> split da "2026-05-18"
+        const fechaCita = cita.fecha.split('T')[0];
+
+        return fechaCita === fechaGrilla;
     });
   }
 
@@ -159,6 +167,35 @@ public activeCitaMenu = signal<{ cita: any, x: number, y: number } | null>(null)
 
   closeCitaMenu() {
     this.activeCitaMenu.set(null);
+  }
+
+
+  getPosicionTop(horaStr: string): string {
+    if (!horaStr) return '0px';
+    const [horas, minutos] = horaStr.split(':').map(Number);
+
+    // Calculamos la posición basándonos en bloques de 15 min
+    // Cada salto de 15 min debe coincidir con el inicio de la siguiente celda
+    const minutosDesdeInicio = (horas - this.HORA_INICIO) * 60 + minutos;
+    const bloquesDe15 = minutosDesdeInicio / 15;
+
+    // IMPORTANTE: El 'top' debe ser acumulativo.
+    // Si un bloque de 15min mide 79px pero el de 30min no es el doble,
+    // hay que ajustar el multiplicador. Prueba con 39.5px como base de posicionamiento:
+    return `${bloquesDe15 * 39.5}px`;
+  }
+
+  getAlturaDinamica(duracion: string | number): string {
+    const min = Number(duracion);
+
+    // Si la duración está en nuestro mapa, usamos el valor exacto
+    if (this.DURACION_HEIGHTS[min]) {
+      return `${this.DURACION_HEIGHTS[min]}px`;
+    }
+
+    // Fallback por si hay una duración distinta (ej: 20 min)
+    // Calculamos una base promedio de 5.3px por minuto basada en tus datos
+    return `${min * 5.3}px`;
   }
 
 }

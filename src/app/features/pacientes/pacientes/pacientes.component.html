@@ -17,7 +17,7 @@
         >
       </div>
 
-      <button class="bg-[#0089d1] text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center gap-2 shrink-0">
+      <button (click)="openModal()" class="bg-[#0089d1] text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center gap-2 shrink-0">
         <i class="fa-solid fa-user-plus"></i> Nuevo Paciente
       </button>
     </div>
@@ -166,752 +166,145 @@
   </div>
 </div>
 
-@if (isFichaOpen()) {
-  <div class="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
-    <div class="bg-white w-full max-w-full h-[94vh] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-8 duration-500">
+@if ( showModal()) {
+  <div class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+    <div class="w-full max-w-5xl bg-white rounded-[32px] shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
 
-      <div class="bg-primary p-10 text-white relative flex justify-between items-end">
-        <div class="flex items-center gap-8">
-          <div class="w-24 h-24 bg-white/20 backdrop-blur-md rounded-[2rem] border-4 border-white/30 flex items-center justify-center text-3xl font-black shadow-xl">
-            {{ getInitials(selectedPaciente()?.user?.fullName) }}
-          </div>
-          <div class="space-y-1">
-            <h2 class="text-3xl font-black tracking-tighter uppercase leading-none">{{ selectedPaciente()?.user?.fullName }}</h2>
-            <div class="flex items-center gap-4 text-xs font-bold opacity-80 mt-2">
-              <span>RUT: {{ selectedPaciente()?.user?.rut }}</span>
-              <span class="opacity-30">|</span>
-              <span>{{ formatearSexo(selectedPaciente()?.sexo) }}</span>
-              <span class="opacity-30">|</span>
-              @if (selectedPaciente()?.fechaNacimiento) {
-                <span class="bg-white/20 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest">
-                  {{ calcularEdad(selectedPaciente()?.fechaNacimiento ?? '') }} Años
-                </span>
-              } @else {
-                <span class="opacity-50 italic text-[9px]">Fecha no registrada</span>
-              }
-            </div>
-          </div>
+      <!-- Header -->
+      <div class="px-8 py-5 border-b border-slate-50 flex justify-between items-center bg-slate-50/50 shrink-0">
+        <div>
+          <h3 class="text-lg font-black text-slate-800 uppercase tracking-tighter">Nuevo Registro de Paciente</h3>
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Sede Chillán / Ficha Clínica Inicial</p>
         </div>
+        <button (click)="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 transition-colors">
+          <i class="fa-solid fa-xmark text-slate-500"></i>
+        </button>
+      </div>
 
-        <div class="flex gap-4">
-          <div class="bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-2xl w-48">
-            <p class="text-[10px] font-black text-yellow-300 uppercase mb-1 tracking-widest">Alertas Médicas</p>
-            <p class="text-[11px] font-bold opacity-90">{{ selectedPaciente()?.alergias || 'Sin información' }}</p>
+      <!-- Cuerpo del Formulario -->
+      <div class="p-10 overflow-y-auto bg-white">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+
+          <!-- Nombre Legal -->
+          <div class="flex flex-col gap-2">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nombre Legal</label>
+            <input type="text" [(ngModel)]="newPatient.fullName" placeholder="Nombre Completo"
+                   class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-[#0089d1] outline-none transition-all">
           </div>
 
-          <div class="bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-2xl w-48 transition-all hover:bg-white/20">
-            <div class="flex items-center gap-2 mb-2 text-cyan-300">
-              <i class="fa-solid fa-pills text-xs"></i>
-              <p class="text-[10px] font-black uppercase tracking-widest">Medicamentos</p>
-            </div>
-            <p class="text-[11px] font-bold opacity-90 leading-tight">
-              {{ selectedPaciente()?.medicamentos || 'Sin registros' }}
-            </p>
+          <!-- RUT -->
+          <div class="flex flex-col gap-2">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">RUT / Identificación</label>
+            <input type="text" [(ngModel)]="newPatient.rut" placeholder="12.345.678-9"
+                   class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-[#0089d1] outline-none transition-all">
           </div>
 
-          <div class="bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-2xl w-48 transition-all hover:bg-white/20">
-            <div class="flex items-center gap-2 mb-2 text-cyan-300">
-              <i class="fa-solid fa-heart text-xs"></i>
-              <p class="text-[10px] font-black uppercase tracking-widest">Enfermedades</p>
-            </div>
-            <p class="text-[11px] font-bold opacity-90 leading-tight">
-              {{ selectedPaciente()?.enfermedades || 'Sin registros' }}
-            </p>
+          <!-- Email -->
+          <div class="flex flex-col gap-2">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email</label>
+            <input type="email" [(ngModel)]="newPatient.email" placeholder="ejemplo@correo.com"
+                   class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-[#0089d1] outline-none transition-all">
           </div>
-          <button (click)="closeFicha()" class="absolute top-6 right-8 text-white/40 hover:text-white transition-all text-2xl">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-      </div>
 
-      <div class="bg-white border-b border-slate-100 flex items-center px-10">
-        @for (tab of ['Datos personales', 'Ficha clínica', 'Planes de tratamiento', 'Facturación']; track tab) {
-          <button (click)="tabActiva.set(tab)"
-                  [class.text-primary]="tabActiva() === tab"
-                  [class.border-primary]="tabActiva() === tab"
-                  class="px-6 py-6 text-[11px] font-black uppercase tracking-widest border-b-4 border-transparent hover:text-primary transition-all">
-            {{ tab }}
-          </button>
-        }
-      </div>
-
-      <div class="flex-1 overflow-y-auto bg-slate-50/50 p-10">
-
-        @if (tabActiva() === 'Datos personales') {
-          @if (selectedPaciente(); as pacienteActivo) {
-          <div class="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm animate-in fade-in duration-500">
-            <div class="flex justify-between items-center mb-10">
-              <h3 class="text-xl font-black text-slate-800 uppercase tracking-tighter">Edición de Perfil</h3>
-              <button (click)="onSavePatientData()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100 transition-all active:scale-95">
-                <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Guardar Datos
-              </button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nombre Legal</label>
-                <input type="text" [(ngModel)]="pacienteActivo.user.fullName" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all">
-              </div>
-
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">RUT / Identificación</label>
-                <input type="text" [(ngModel)]="pacienteActivo.user.rut" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all">
-              </div>
-
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email</label>
-                <input type="email" [(ngModel)]="pacienteActivo.user.email" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all">
-              </div>
-
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Fecha de Nacimiento</label>
-                <input
-    type="date"
-    [value]="formatDateForInput(pacienteActivo.fechaNacimiento)"
-    (change)="onDateChange($event, pacienteActivo)"
-    class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all">
-              </div>
-
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Sexo</label>
-                <select [(ngModel)]="pacienteActivo.sexo" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all appearance-none">
-                  <option value="MASCULINO">Masculino</option>
-                  <option value="FEMENINO">Femenino</option>
-                  <option value="OTRO">Otro</option>
-                </select>
-              </div>
-
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Dirección</label>
-                <input type="text" [(ngModel)]="pacienteActivo.direccion" placeholder="Calle, número, depto..." class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all">
-              </div>
-
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Comuna</label>
-                <input type="text" [(ngModel)]="pacienteActivo.comuna" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all">
-              </div>
-
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ciudad</label>
-                <input type="text" [(ngModel)]="pacienteActivo.ciudad" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all">
-              </div>
-
-              <div class="space-y-2 md:col-span-2">
-                <label class="text-[10px] font-black text-rose-400 uppercase tracking-widest ml-1">Enfermedades y Antecedentes</label>
-                <textarea [(ngModel)]="pacienteActivo.enfermedades"
-                          rows="2"
-                          placeholder="Hipertensión, Diabetes, etc..."
-                          class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-rose-200 outline-none transition-all resize-none"></textarea>
-              </div>
-
-              <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Alergias</label>
-                <textarea [(ngModel)]="pacienteActivo.alergias"
-                          rows="2"
-                          placeholder="Penicilina, Látex, etc..."
-                          class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all resize-none"></textarea>
-              </div>
-
-              <div class="space-y-2 md:col-span-3">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Medicamentos Actuales</label>
-                <textarea [(ngModel)]="pacienteActivo.medicamentos"
-                          rows="2"
-                          placeholder="Indique fármacos y dosis actuales..."
-                          class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all resize-none"></textarea>
-              </div>
-
-            </div>
+          <!-- Fecha Nacimiento -->
+          <div class="flex flex-col gap-2">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Fecha de Nacimiento</label>
+            <input type="date" [(ngModel)]="newPatient.fechaNacimiento"
+                   class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-[#0089d1] outline-none transition-all">
           </div>
-        }
-      }
-        @if (tabActiva() === 'Ficha clínica') {
-            <div class="flex flex-col h-full animate-in fade-in duration-500">
 
-              <div class="bg-white border-b border-slate-100 sticky top-0 z-20 px-8">
-                <div class="flex gap-10 overflow-x-auto no-scrollbar">
-                  @for (subTab of [
-                    'Historial', 'Evoluciones', 'Antecedentes médicos',
-                    'Odontograma', 'Periodontograma', 'Rx y Documentos',
-                    'Recetas', 'Documentos Clínicos', 'Consentimientos'
-                  ]; track subTab) {
-                    <button (click)="subTabActiva.set(subTab)"
-                            [class.text-emerald-600]="subTabActiva() === subTab"
-                            [class.border-emerald-500]="subTabActiva() === subTab"
-                            [class.text-slate-400]="subTabActiva() !== subTab"
-                            class="py-5 px-1 text-[10px] font-black uppercase tracking-[0.15em] border-b-2 border-transparent transition-all hover:text-emerald-500 whitespace-nowrap relative">
-                      {{ subTab }}
-                      @if (subTabActiva() === subTab) {
-                        <div class="absolute -bottom-[2px] left-1/2 -translate-x-1/2 w-1 h-1 bg-emerald-500 rounded-full"></div>
-                      }
-                    </button>
-                  }
-                </div>
-              </div>
-
-              <div class="flex-1 bg-slate-50/30 overflow-y-auto custom-scrollbar">
-                <div class="max-w-7xl mx-auto">
-
-                  @switch (subTabActiva()) {
-                    @case ('Historial') {
-                      <div class="p-8 h-full animate-in fade-in duration-500 bg-slate-50/30">
-
-                        <div class="flex items-center justify-between mb-10 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                          <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Historial del Paciente</h2>
-
-                          <div class="flex items-center gap-4">
-                            <div class="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-xl">
-                              <span class="text-[10px] font-black text-slate-400 uppercase">Filtrar por mes:</span>
-                              <select class="bg-transparent text-[11px] font-bold text-slate-600 outline-none">
-                                <option>Todos los meses</option>
-                              </select>
-                            </div>
-
-                            <button class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-900 text-white hover:bg-primary transition-all">
-                              <i class="fa-solid fa-print text-xs"></i>
-                            </button>
-                          </div>
-                        </div>
-
-                        <div class="relative max-w-4xl mx-auto">
-
-                          <div class="absolute left-[148px] top-0 bottom-0 w-1 bg-emerald-600/20 rounded-full"></div>
-
-                          <div class="relative flex items-start gap-12 mb-12 group">
-
-                            <div class="w-28 text-right pt-2">
-                              <span class="text-sm font-black text-emerald-700/60 uppercase tracking-tighter italic">
-                                abr. 6, 2026
-                              </span>
-                            </div>
-
-                            <div class="relative z-10">
-                              <div class="w-5 h-5 rounded-full bg-emerald-600 border-4 border-white shadow-sm transition-transform group-hover:scale-125"></div>
-                            </div>
-
-                            <div class="flex-1 bg-white rounded-3xl border-l-4 border-l-blue-500 border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-all">
-                              <div class="bg-blue-50/50 px-6 py-2 border-b border-blue-50 flex justify-between items-center">
-                                <span class="text-[9px] font-black text-blue-600 uppercase tracking-widest">Presupuesto Creado</span>
-                                <i class="fa-solid fa-list-check text-blue-400 text-xs"></i>
-                              </div>
-                              <div class="p-6">
-                                <h4 class="text-sm font-black text-slate-700 uppercase leading-tight mb-1">Rehabilitación Oral Completa</h4>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
-                                  Dr(a). Pamela Rodriguez • RUT: 16.242.287-1
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="relative flex items-start gap-12 mb-12 group">
-                            <div class="w-28 text-right pt-2">
-                              <span class="text-sm font-black text-emerald-700/60 uppercase tracking-tighter italic">
-                                oct. 3, 2025
-                              </span>
-                            </div>
-
-                            <div class="relative z-10">
-                              <div class="w-5 h-5 rounded-full bg-emerald-600 border-4 border-white shadow-sm"></div>
-                            </div>
-
-                            <div class="flex-1 bg-white rounded-3xl border-l-4 border-l-rose-500 border border-slate-100 shadow-sm overflow-hidden">
-                              <div class="bg-rose-50/50 px-6 py-2 border-b border-rose-50 flex justify-between items-center">
-                                <span class="text-[9px] font-black text-rose-600 uppercase tracking-widest">Cita Agendada</span>
-                                <i class="fa-solid fa-clock text-rose-400 text-xs"></i>
-                              </div>
-                              <div class="p-6">
-                                <h4 class="text-sm font-black text-slate-700 uppercase leading-tight mb-1">No Confirmado</h4>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
-                                  Dr(a). Pamela Rodriguez • 18:00 hrs
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="relative flex items-start gap-12 mb-12 group opacity-60">
-                            <div class="w-28 text-right pt-2">
-                              <span class="text-sm font-black text-slate-400 uppercase tracking-tighter italic">
-                                oct. 2, 2025
-                              </span>
-                            </div>
-
-                            <div class="relative z-10">
-                              <div class="w-5 h-5 rounded-full bg-slate-300 border-4 border-white shadow-sm"></div>
-                            </div>
-
-                            <div class="flex-1 bg-white rounded-3xl border-l-4 border-l-slate-400 border border-slate-100 shadow-sm overflow-hidden italic">
-                              <div class="bg-slate-50 px-6 py-2 border-b border-slate-100 flex justify-between items-center">
-                                <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Cita Anulada</span>
-                                <i class="fa-solid fa-ban text-slate-300 text-xs"></i>
-                              </div>
-                              <div class="p-6 text-slate-400">
-                                <h4 class="text-sm font-bold uppercase leading-tight mb-1">Anulado por el paciente</h4>
-                                <p class="text-[10px] font-medium uppercase tracking-tight">
-                                  Motivo: Problemas Personales
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-
-                        </div>
-                      </div>
-                    }
-
-                    @case('Evoluciones'){
-                      <div class="p-8 h-full animate-in fade-in duration-500 bg-slate-50/30">
-
-                        <div class="flex items-center justify-between mb-8 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                          <div class="flex flex-col">
-                            <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Evoluciones Clínicas</h2>
-                            <div class="flex gap-4 mt-2">
-                               <span class="text-[10px] font-black text-primary border-b-2 border-primary pb-1 uppercase cursor-pointer">Todas las evoluciones</span>
-                               <span class="text-[10px] font-black text-slate-400 uppercase cursor-pointer hover:text-slate-600">Solo mis registros</span>
-                            </div>
-                          </div>
-
-                          <div class="flex items-center gap-3">
-                            <button class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-400 hover:text-slate-600 transition-all">
-                              <i class="fa-solid fa-print"></i>
-                            </button>
-                            <div class="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
-                               <input type="checkbox" class="rounded border-slate-300 text-primary">
-                               <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Mostrar anuladas</span>
-                            </div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-6 max-w-5xl mx-auto">
-
-                          <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden group">
-                            <div class="px-8 py-4 bg-slate-50/50 border-b border-slate-50 flex justify-between items-center">
-                              <div class="flex items-center gap-2">
-                                <i class="fa-solid fa-user-circle text-blue-500"></i>
-                                <span class="text-[11px] font-black text-slate-700 uppercase tracking-tight">Pamela Rodriguez (#2763)</span>
-                                <span class="text-[9px] font-bold text-slate-400 lowercase">a través de Pamela Rodriguez</span>
-                                <i class="fa-solid fa-house-chimney text-[10px] text-slate-300 ml-2"></i>
-                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Glow Odontología y Estética</span>
-                              </div>
-                              <div class="flex items-center gap-2 text-slate-400">
-                                <i class="fa-solid fa-calendar-day text-xs"></i>
-                                <span class="text-[10px] font-black uppercase tracking-tighter">Escrita el 16 de septiembre de 2024 18:16</span>
-                              </div>
-                            </div>
-
-                            <div class="p-8">
-                              <div class="mb-4">
-                                <p class="text-[11px] font-black text-slate-900 uppercase tracking-widest mb-1">Plan de tratamiento #2572:</p>
-                                <p class="text-sm font-bold text-blue-600 uppercase italic">Acción realizada: RESTAURACIÓN COMPUESTA Pieza 2.5</p>
-                              </div>
-
-                              <div class="text-slate-600 text-sm font-medium leading-relaxed bg-slate-50/50 p-6 rounded-2xl border border-slate-50">
-                                <p>Paciente evoluciona favorablemente. Se realiza restauración sin complicaciones. Se indica post-operatorio estándar.</p>
-                                <p class="mt-2 text-slate-300">ok</p>
-                                <p class="text-slate-300">-</p>
-                              </div>
-                            </div>
-
-                            <div class="px-8 py-3 bg-white border-t border-slate-50 flex justify-end">
-                               <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">
-                                 <i class="fa-solid fa-lock mr-1"></i> Registro Clínico Protegido
-                               </span>
-                            </div>
-                          </div>
-
-                        </div>
-                      </div>
-                    }
-
-                    @case ('Odontograma') {
-                      <div class="p-8 animate-in fade-in duration-500">
-                        <div class="bg-white rounded-[3rem] p-10 border border-slate-100 shadow-sm relative overflow-hidden">
-                            <app-odontograma></app-odontograma>
-                        </div>
-
-                      </div>
-                    }
-
-                    @case ('Antecedentes médicos') {
-                      <div class="p-8">
-                        <div class="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm">
-                            <h3 class="text-sm font-black uppercase tracking-widest text-slate-400 mb-6">Resumen de Salud</h3>
-                            <p class="text-sm font-bold text-slate-700 italic">"{{ selectedPaciente()?.enfermedades || 'Sin antecedentes registrados' }}"</p>
-                         </div>
-                      </div>
-                    }
-
-                    @case ('Rx y Documentos') {
-                      <div class="p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-
-                        <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                          <div class="flex flex-col">
-                            <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Rx y Documentos</h2>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Gestión de imágenes y archivos</p>
-                          </div>
-
-                          <div class="flex items-center gap-3">
-                            <div class="hidden md:flex gap-2">
-                              <select class="bg-slate-50 border-none rounded-xl px-4 py-2.5 text-[10px] font-black uppercase text-slate-400 outline-none focus:ring-2 focus:ring-primary/20 transition-all">
-                                <option>Filtrar por usuario</option>
-                              </select>
-                              <select class="bg-slate-50 border-none rounded-xl px-4 py-2.5 text-[10px] font-black uppercase text-slate-400 outline-none focus:ring-2 focus:ring-primary/20 transition-all">
-                                <option>Filtrar por fecha</option>
-                              </select>
-                            </div>
-
-
-
-                          </div>
-                        </div>
-
-                        <div
-                             class="group relative flex flex-col items-center justify-center py-32 border-2 border-dashed border-slate-200 rounded-[3.5rem] bg-slate-50/50 hover:bg-white hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-50 transition-all duration-500 cursor-pointer overflow-hidden">
-
-                          <div class="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
-                            <i class="fa-solid fa-file-image text-[10rem]"></i>
-                          </div>
-
-                          <div class="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center shadow-sm mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                            <i class="fa-solid fa-inbox text-4xl text-slate-200 group-hover:text-blue-400 transition-colors"></i>
-                          </div>
-
-                          <div class="text-center space-y-2">
-                            <p class="text-sm font-black text-slate-400 uppercase tracking-widest group-hover:text-slate-600 transition-colors">
-                              Este paciente aún no cuenta con documentos
-                            </p>
-
-                          </div>
-
-                          <div class="absolute bottom-0 left-0 w-0 h-1.5 bg-blue-500 group-hover:w-full transition-all duration-1000"></div>
-                        </div>
-
-                      </div>
-                    }
-
-
-                    @case ('Recetas') {
-                      <div class="p-8 h-full animate-in fade-in duration-500">
-
-                        <div class="flex justify-between items-center mb-8">
-                          <div class="flex flex-col">
-                            <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Historial de Prescripciones</h2>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Consulta de recetas emitidas por el equipo médico</p>
-                          </div>
-
-                          <div class="flex items-center gap-4">
-                            <select class="bg-white border border-slate-100 rounded-xl px-4 py-2 text-[11px] font-bold text-slate-500 outline-none shadow-sm">
-                              <option>Filtrar por dentista</option>
-                              <option>Filtrar por fecha</option>
-                            </select>
-                            <div class="h-8 w-[1px] bg-slate-100"></div>
-                            <span class="flex items-center gap-2 text-[10px] font-black text-blue-500 bg-blue-50 px-3 py-2 rounded-lg uppercase tracking-tighter">
-                              <i class="fa-solid fa-eye"></i> Modo Auditoría
-                            </span>
-                          </div>
-                        </div>
-
-                        <div class="max-w-5xl mx-auto space-y-6">
-
-                          <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-8 hover:shadow-md transition-all relative group">
-
-                            <div class="flex justify-between items-start mb-6">
-                              <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
-                                  <i class="fa-solid fa-user-md text-xl"></i>
-                                </div>
-                                <div>
-                                  <h4 class="text-sm font-black text-slate-800 uppercase tracking-tight">Dr(a). Pamela Rodriguez</h4>
-                                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                    Folio #2353 • Emitida el 27 de abril, 2026
-                                  </p>
-                                </div>
-                              </div>
-
-                              <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-widest border border-emerald-100">
-                                Vigente
-                              </span>
-                            </div>
-
-                            <div class="bg-slate-50/50 rounded-2xl p-6 border border-slate-50 mb-6">
-                              <div class="text-sm font-bold text-slate-600 leading-relaxed italic">
-                                <p class="mb-3 text-slate-800 font-black uppercase text-[11px]">Indicaciones:</p>
-                                <p class="mb-2">Optagen Compuesto (solución oftalmica)</p>
-                                <p>1 gota en cada ojo cada 8 horas por 7 dias</p>
-                              </div>
-                            </div>
-
-                            <div class="flex justify-between items-center pt-6 border-t border-slate-50">
-                              <div class="flex gap-2">
-                                <span class="text-[9px] font-black text-slate-300 uppercase tracking-tighter">Tratamiento asociado:</span>
-                                <span class="text-[9px] font-black text-primary uppercase underline cursor-pointer">Ortodoncia Interceptiva</span>
-                              </div>
-
-                              <div class="flex gap-3">
-                                <button class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-primary transition-all text-[10px] font-black uppercase tracking-widest shadow-lg shadow-slate-200">
-                                  <i class="fa-solid fa-print text-[10px]"></i> Imprimir Copia
-                                </button>
-
-                                <button class="flex items-center justify-center w-10 h-10 rounded-xl border border-slate-100 text-slate-400 hover:text-blue-500 hover:bg-blue-50 transition-all" title="Reenviar por Correo">
-                                  <i class="fa-solid fa-paper-plane"></i>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-
-                          </div>
-                      </div>
-                    }
-
-                    @case ('Documentos Clínicos') {
-                      <div class="p-8 space-y-8 animate-in fade-in duration-500">
-
-                        <div class="flex justify-between items-center">
-                          <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Documentos clínicos</h2>
-
-                          <div class="flex items-center gap-3">
-                            <label class="flex items-center gap-2 bg-slate-100 px-4 py-2 rounded-xl text-[11px] font-bold text-slate-500 cursor-pointer hover:bg-slate-200 transition-all">
-                              <input type="checkbox" class="rounded border-slate-300 text-emerald-500"> Ver anulados
-                            </label>
-
-
-                          </div>
-                        </div>
-
-                        <div class="flex flex-col items-center justify-center py-32 border-t border-slate-100">
-                          <div class="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mb-6">
-                            <i class="fa-solid fa-box-archive text-3xl text-slate-200"></i>
-                          </div>
-                          <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Este paciente no cuenta con ningún documento clínico</p>
-                        </div>
-
-                      </div>
-                    }
-
-                    @case ('Consentimientos') {
-                      <div class="p-8 space-y-8 animate-in fade-in duration-500">
-
-                        <div class="flex justify-between items-center">
-                          <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Consentimiento informado</h2>
-
-                          <div class="flex items-center gap-4">
-                            <label class="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase cursor-pointer">
-                              <input type="checkbox" class="rounded border-slate-300 text-emerald-500"> Mostrar anulados
-                            </label>
-
-
-                          </div>
-                        </div>
-
-                        <div class="flex flex-col items-center justify-center py-32 border-t border-slate-100">
-                          <div class="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mb-6">
-                            <i class="fa-solid fa-inbox text-3xl text-slate-200"></i>
-                          </div>
-                          <p class="text-sm font-bold text-slate-400 text-center uppercase tracking-widest leading-relaxed">
-                            Este paciente no cuenta con ningún consentimiento informado <br> creado en la plataforma.
-                          </p>
-                        </div>
-
-                      </div>
-                    }
-
-
-
-
-
-                    @default {
-                      <div class="flex flex-col items-center justify-center py-20 text-slate-300">
-                        <i class="fa-solid fa-person-digging text-4xl mb-4 opacity-20"></i>
-                        <p class="text-[10px] font-black uppercase tracking-widest">Módulo {{ subTabActiva() }} en desarrollo</p>
-                      </div>
-                    }
-                  }
-                </div>
-              </div>
-            </div>
-          }
-
-        @if (tabActiva() === 'Planes de tratamiento') {
-
-            <div class="p-6 space-y-6 animate-in fade-in duration-500">
-
-              <div class="flex justify-between items-center bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                <div class="flex flex-col">
-                  <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">Planes de tratamiento</h2>
-                  <div class="flex gap-4 mt-2">
-                     <span class="text-[10px] font-black text-primary border-b-2 border-primary pb-1 uppercase cursor-pointer">Todos los planes</span>
-                     <span class="text-[10px] font-black text-slate-400 uppercase cursor-pointer hover:text-slate-600">Mis planes</span>
-                  </div>
-                </div>
-
-
-              </div>
-
-              @if (viewMode() === 'list') {
-                <div class="bg-slate-50/50 rounded-[2rem] p-12 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400">
-                  <i class="fa-solid fa-folder-open text-4xl mb-4 opacity-20"></i>
-                  <p class="text-xs font-bold uppercase tracking-widest">El paciente no cuenta con tratamientos en ejecución</p>
-                </div>
-              } @else {
-                <div class="animate-in slide-in-from-bottom-4 duration-500">
-                  <div class="mb-4 flex items-center gap-4">
-                    <button (click)="viewMode.set('list')" class="text-slate-400 hover:text-primary transition-colors">
-                      <i class="fa-solid fa-arrow-left"></i>
-                    </button>
-
-                  </div>
-
-                </div>
-              }
-            </div>
-
-        }
-      </div>
-
-    </div>
-  </div>
-}
-
-@if (showModalNuevo()) {
-  <div class="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-md animate-in fade-in duration-300">
-
-    <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.3)] animate-in zoom-in-95 duration-300 relative">
-
-      <div class="text-center mb-8">
-        <div class="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center mx-auto mb-5 border border-emerald-100 shadow-inner">
-          <i class="fa-solid fa-file-medical text-3xl text-emerald-500"></i>
-        </div>
-        <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tighter italic">Identificar Tratamiento</h3>
-        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-2">Ponle un nombre al plan de {{ selectedPaciente()?.user?.fullName }}</p>
-      </div>
-
-      <div class="space-y-6">
-        <div class="space-y-2">
-          <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Nombre del Plan</label>
-          <input type="text"
-                 [(ngModel)]="nombreNuevoPlan"
-                 placeholder="Ej: Rehabilitación Superior"
-                 class="w-full px-6 py-5 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-emerald-500/30 focus:bg-white focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all font-bold text-slate-800 text-sm">
-        </div>
-
-        <div class="flex gap-4 pt-2">
-          <button (click)="showModalNuevo.set(false)"
-                  class="flex-1 py-4 rounded-2xl text-slate-400 font-black uppercase text-[10px] tracking-widest hover:bg-slate-100 transition-all">
-            Cancelar
-          </button>
-          <button (click)="crearPlan()"
-                  [disabled]="nombreNuevoPlan().length < 4"
-                  class="flex-[1.5] py-4 rounded-2xl bg-slate-900 text-white font-black uppercase text-[10px] tracking-[0.15em] shadow-2xl shadow-slate-200 disabled:opacity-20 hover:bg-slate-800 transition-all">
-            Crear y Diagnosticar
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-}
-
-@if (showModalDocumento()) {
-  <div class="fixed inset-0 z-[1120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-
-    <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-
-      <div class="px-8 py-6 border-b border-slate-50">
-        <h3 class="text-2xl font-black text-slate-800 tracking-tighter italic uppercase">Nuevo documento clínico</h3>
-      </div>
-
-      <div class="p-8 space-y-6">
-        <div class="space-y-3">
-          <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Seleccione el tipo de documento clínico que desea crear</label>
-
-          <div class="relative">
-            <select [(ngModel)]="tipoDocumentoSeleccionado"
-                    class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-xl text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-500 outline-none transition-all appearance-none">
-              <option value="" disabled selected>Seleccionar tipo de documento...</option>
-              @for (opcion of opcionesDocumentos; track opcion) {
-                <option [value]="opcion">{{ opcion }}</option>
-              }
+          <!-- Sexo -->
+          <div class="flex flex-col gap-2">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Sexo</label>
+            <select [(ngModel)]="newPatient.sexo"
+                    class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-[#0089d1] outline-none transition-all appearance-none cursor-pointer">
+              <option value="MASCULINO">Masculino</option>
+              <option value="FEMENINO">Femenino</option>
+              <option value="OTRO">Otro</option>
             </select>
-            <i class="fa-solid fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"></i>
           </div>
-        </div>
 
-        <div class="bg-blue-50/50 p-4 rounded-xl flex gap-3 items-start border border-blue-100/50">
-          <i class="fa-solid fa-circle-info text-blue-400 mt-1"></i>
-          <p class="text-[11px] font-bold text-blue-600 leading-relaxed uppercase tracking-tight">
-            Si desea diseñar un nuevo documento clínico, debe hacerlo desde la sección de <span class="underline cursor-pointer">administración</span>.
-          </p>
+          <!-- Dirección -->
+          <div class="flex flex-col gap-2">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Dirección</label>
+            <input type="text" [(ngModel)]="newPatient.direccion" placeholder="Calle, número, depto..."
+                   class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-[#0089d1] outline-none transition-all">
+          </div>
+
+          <!-- Comuna -->
+          <div class="flex flex-col gap-2">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Comuna</label>
+            <input type="text" [(ngModel)]="newPatient.comuna"
+                   class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-[#0089d1] outline-none transition-all">
+          </div>
+
+          <!-- Ciudad -->
+          <div class="flex flex-col gap-2">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ciudad</label>
+            <input type="text" [(ngModel)]="newPatient.ciudad"
+                   class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-[#0089d1] outline-none transition-all">
+          </div>
+
+          <!-- Espaciador para mantener el grid si es necesario -->
+          <div></div>
+
+          <!-- Textareas con ancho completo -->
+          <div class="flex flex-col gap-2 md:col-span-2">
+            <label class="text-[10px] font-black text-rose-500 uppercase tracking-widest ml-1">Enfermedades y Antecedentes</label>
+            <textarea [(ngModel)]="newPatient.enfermedades" rows="3" placeholder="Hipertensión, Diabetes, etc..."
+                      class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-rose-200 outline-none transition-all resize-none"></textarea>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Alergias</label>
+            <textarea [(ngModel)]="newPatient.alergias" rows="3" placeholder="Penicilina, Látex, etc..."
+                      class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-[#0089d1] outline-none transition-all resize-none"></textarea>
+          </div>
+
+          <div class="flex flex-col gap-2 md:col-span-3">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Medicamentos Actuales</label>
+            <textarea [(ngModel)]="newPatient.medicamentos" rows="3" placeholder="Indique fármacos y dosis actuales..."
+                      class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-[#0089d1] outline-none transition-all resize-none"></textarea>
+          </div>
+
         </div>
       </div>
 
-      <div class="px-8 py-6 bg-slate-50/50 flex justify-end gap-3">
-        <button (click)="showModalDocumento.set(false)"
-                class="px-8 py-3 rounded-xl bg-slate-200 text-slate-600 font-black uppercase text-[10px] tracking-widest hover:bg-slate-300 transition-all">
-          Cerrar
+      <!-- Footer -->
+      <div class="p-8 border-t border-slate-50 bg-slate-50/30 flex gap-4 shrink-0">
+        <button (click)="closeModal()" class="flex-1 py-4 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-all">
+          Descartar
         </button>
-        <button (click)="continuarCreacionDoc()"
-                [disabled]="!tipoDocumentoSeleccionado()"
-                class="px-10 py-3 rounded-xl bg-blue-600 text-white font-black uppercase text-[10px] tracking-widest shadow-lg shadow-blue-100 hover:bg-blue-700 disabled:opacity-30 transition-all">
-          Continuar
-        </button>
-      </div>
-    </div>
-  </div>
-}
-
-@if (showModalConsentimiento()) {
-  <div class="fixed inset-0 z-[1130] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-
-    <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-
-      <div class="px-8 py-6 border-b border-slate-50">
-        <h3 class="text-2xl font-black text-slate-800 tracking-tighter italic uppercase">Nuevo Consentimiento Informado</h3>
-      </div>
-
-      <div class="p-8 space-y-6">
-
-        <div class="space-y-2">
-          <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Seleccione el tipo de consentimiento informado que desea crear</label>
-          <select [(ngModel)]="nuevoConsentimiento().tipo"
-                  class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-emerald-500/20 transition-all">
-            <option value="" disabled>Seleccionar---</option>
-            <option value="EXODONCIA">Exodoncia Simple</option>
-            <option value="IMPLANTE">Implante Dental</option>
-            <option value="ENDODONCIA">Endodoncia</option>
-          </select>
-          <p class="text-[10px] font-bold text-slate-400 italic ml-1">Si desea diseñar una nueva plantilla, debe hacerlo desde administración.</p>
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Plan de tratamiento</label>
-          <select [(ngModel)]="nuevoConsentimiento().planTratamiento"
-                  class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-emerald-500/20 transition-all">
-            <option value="">Seleccionar</option>
-            <option value="3941">#3941: Rehabilitación</option>
-            <option value="2353">#2353: Nuevo plan de tratamiento</option>
-          </select>
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Seleccione el profesional a cargo</label>
-          <select [(ngModel)]="nuevoConsentimiento().profesional"
-                  class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-emerald-500/20 transition-all">
-            <option value="Pamela Rodriguez">Pamela Rodriguez</option>
-            <option value="Alexis Rodriguez">Alexis Rodriguez</option>
-          </select>
-        </div>
-
-      </div>
-
-      <div class="px-8 py-6 bg-slate-50/50 flex justify-end gap-3">
-        <button (click)="showModalConsentimiento.set(false)"
-                class="px-8 py-3 rounded-xl bg-slate-200 text-slate-600 font-black uppercase text-[10px] tracking-widest hover:bg-slate-300 transition-all">
-          Cerrar
-        </button>
-        <button (click)="crearConsentimiento()"
-                [disabled]="!nuevoConsentimiento().tipo"
-                class="px-10 py-3 rounded-xl bg-emerald-500 text-white font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-100 hover:bg-emerald-600 disabled:opacity-30 transition-all">
-          Crear
+        <button (click)="savePatient()"
+                [disabled]="!newPatient.fullName || !newPatient.rut"
+                class="flex-[2] bg-[#0089d1] py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-white shadow-xl shadow-blue-100 hover:bg-blue-600 transition-all disabled:opacity-30">
+          Guardar nuevo Paciente
         </button>
       </div>
     </div>
   </div>
 }
 
+@if (pacientesService.notification().show) {
+  <div class="fixed bottom-10 right-10 z-[100] animate-in slide-in-from-right duration-300">
+    <div class="bg-white border-l-4 border-[#00a79d] shadow-2xl rounded-2xl p-5 flex items-center gap-4 min-w-[320px]">
+      <!-- Icono de Check con el turquesa de tu logo -->
+      <div class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-[#00a79d]">
+        <i class="fa-solid fa-circle-check text-xl"></i>
+      </div>
+
+      <div class="flex flex-col">
+        <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Éxito</span>
+        <p class="text-sm font-bold text-slate-700">
+          {{ pacientesService.notification().message }}
+        </p>
+      </div>
+
+      <button (click)="pacientesService.notification.set({message:'', show:false})"
+              class="ml-auto text-slate-300 hover:text-slate-500 transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+}
 

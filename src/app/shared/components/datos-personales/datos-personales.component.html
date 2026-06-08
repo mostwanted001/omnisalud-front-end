@@ -1,0 +1,167 @@
+<!-- 👥 VALIDACIÓN PRINCIPAL: Captura al paciente con su alias de forma segura -->
+@if (selectedPaciente(); as pacienteActivo) {
+
+  <!-- ⌛ Sub-caso A: Si ya existe el objeto pero el servicio está cargando (ej: refresco manual) -->
+  @if (loading()) {
+    <div class="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm animate-pulse">
+
+      <!-- Cabecera del Skeleton -->
+      <div class="flex justify-between items-center mb-10">
+        <div class="h-6 w-48 bg-slate-200 rounded-lg"></div>
+        <div class="h-10 w-40 bg-slate-200 rounded-2xl"></div>
+      </div>
+
+      <!-- Grilla de Inputs ficticios -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        @for (input of [1,2,3,4,5,6,7,8]; track input) {
+          <div class="space-y-3">
+            <div class="h-3 w-24 bg-slate-200 rounded-md ml-1"></div>
+            <div class="h-[54px] w-full bg-slate-100 rounded-2xl border border-slate-100"></div>
+          </div>
+        }
+
+        <!-- Textarea doble (Enfermedades) -->
+        <div class="space-y-3 md:col-span-2">
+          <div class="h-3 w-44 bg-slate-200 rounded-md ml-1"></div>
+          <div class="h-[76px] w-full bg-slate-100 rounded-2xl border border-slate-100"></div>
+        </div>
+
+        <!-- Textarea simple (Alergias) -->
+        <div class="space-y-3">
+          <div class="h-3 w-20 bg-slate-200 rounded-md ml-1"></div>
+          <div class="h-[76px] w-full bg-slate-100 rounded-2xl border border-slate-100"></div>
+        </div>
+
+        <!-- Textarea triple (Medicamentos) -->
+        <div class="space-y-3 md:col-span-3">
+          <div class="h-3 w-36 bg-slate-200 rounded-md ml-1"></div>
+          <div class="h-[76px] w-full bg-slate-100 rounded-2xl border border-slate-100"></div>
+        </div>
+      </div>
+
+    </div>
+  }
+  @else {
+    <div class="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm animate-in fade-in duration-500">
+      <div class="flex justify-between items-center mb-10">
+        <h3 class="text-xl font-black text-slate-800 uppercase tracking-tighter">Edición de Perfil</h3>
+        <button (click)="onSavePatientData()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100 transition-all active:scale-95">
+          <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Guardar Datos
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nombre Legal</label>
+          <input type="text" [(ngModel)]="pacienteActivo.user.fullName" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all">
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">RUT / Identificación</label>
+          <input type="text" [(ngModel)]="pacienteActivo.user.rut" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all">
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email</label>
+          <input type="email" [(ngModel)]="pacienteActivo.user.email" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all">
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Fecha de Nacimiento</label>
+          <input
+              type="date"
+              [value]="formatDateForInput(pacienteActivo.fechaNacimiento)"
+              (change)="onDateChange($event, pacienteActivo)"
+              class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all"
+            >
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Sexo</label>
+          <select [(ngModel)]="pacienteActivo.sexo" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all appearance-none">
+            <option value="MASCULINO">Masculino</option>
+            <option value="FEMENINO">Femenino</option>
+            <option value="OTRO">Otro</option>
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Dirección</label>
+          <input type="text" [(ngModel)]="pacienteActivo.direccion" placeholder="Calle, número, depto..." class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all">
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Comuna</label>
+          <input type="text" [(ngModel)]="pacienteActivo.comuna" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all">
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ciudad</label>
+          <input type="text" [(ngModel)]="pacienteActivo.ciudad" class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all">
+        </div>
+
+        <div class="space-y-2 md:col-span-2">
+          <label class="text-[10px] font-black text-rose-400 uppercase tracking-widest ml-1">Enfermedades y Antecedentes</label>
+          <textarea [(ngModel)]="pacienteActivo.enfermedades"
+                    rows="2"
+                    placeholder="Hipertensión, Diabetes, etc..."
+                    class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-rose-200 outline-none transition-all resize-none"></textarea>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Alergias</label>
+          <textarea [(ngModel)]="pacienteActivo.alergias"
+                    rows="2"
+                    placeholder="Penicilina, Látex, etc..."
+                    class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all resize-none"></textarea>
+        </div>
+
+        <div class="space-y-2 md:col-span-3">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Medicamentos Actuales</label>
+          <textarea [(ngModel)]="pacienteActivo.medicamentos"
+                    rows="2"
+                    placeholder="Indique fármacos y dosis actuales..."
+                    class="w-full bg-slate-50 border border-slate-100 p-4 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary outline-none transition-all resize-none"></textarea>
+        </div>
+
+      </div>
+    </div>
+  }
+
+}
+
+@else {
+  <div class="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm animate-pulse">
+
+    <div class="flex justify-between items-center mb-10">
+      <div class="h-6 w-48 bg-slate-200 rounded-lg"></div>
+      <div class="h-10 w-40 bg-slate-200 rounded-2xl"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      @for (input of [1,2,3,4,5,6,7,8]; track input) {
+        <div class="space-y-3">
+          <div class="h-3 w-24 bg-slate-200 rounded-md ml-1"></div>
+          <div class="h-[54px] w-full bg-slate-100 rounded-2xl border border-slate-100"></div>
+        </div>
+      }
+
+      <div class="space-y-3 md:col-span-2">
+        <div class="h-3 w-44 bg-slate-200 rounded-md ml-1"></div>
+        <div class="h-[76px] w-full bg-slate-100 rounded-2xl border border-slate-100"></div>
+      </div>
+
+      <div class="space-y-3">
+        <div class="h-3 w-20 bg-slate-200 rounded-md ml-1"></div>
+        <div class="h-[76px] w-full bg-slate-100 rounded-2xl border border-slate-100"></div>
+      </div>
+
+      <div class="space-y-3 md:col-span-3">
+        <div class="h-3 w-36 bg-slate-200 rounded-md ml-1"></div>
+        <div class="h-[76px] w-full bg-slate-100 rounded-2xl border border-slate-100"></div>
+      </div>
+    </div>
+
+  </div>
+}

@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { catchError, Observable, of, tap, throwError } from 'rxjs';
-import { environment } from '../../../../environments/environment.development';
+import { environment } from '../../../../environments/environment';
 import { Atencion } from '../../../core/models/atencion.model';
 
 
@@ -15,6 +15,7 @@ export class AtencionesService {
   // --- SIGNALS (Single Source of Truth) ---
   public atenciones = signal<any[]>([]);
   public isLoading = signal<boolean>(false);
+  public notification = signal<{message: string, show: boolean}>({ message: '', show: false });
 
   // --- COMPUTED SIGNALS (Lógica reactiva sin peticiones extra) ---
   // Se actualizan solos cuando 'atenciones' cambia
@@ -33,6 +34,13 @@ export class AtencionesService {
 
   private initData() {
     this.findAll().subscribe();
+  }
+
+  showSuccess(msg: string) {
+    this.notification.set({ message: msg, show: true });
+    setTimeout(() => {
+      this.notification.set({ message: '', show: false });
+    }, 5000); // Se oculta tras 3 segundos
   }
 
   /**
@@ -63,7 +71,6 @@ export class AtencionesService {
   create(atencionData: any): Observable<any> {
     return this.http.post<any>(this.apiUrl, atencionData).pipe(
       tap(nueva => {
-        // Optimistic UI: agregamos al signal de inmediato
         this.atenciones.update(list => [nueva, ...list]);
       })
     );
@@ -98,6 +105,16 @@ export class AtencionesService {
    */
   getHistorialByPaciente(pacienteId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/paciente/${pacienteId}/historial`);
+  }
+
+  getAtencionesSemana(inicio: string, fin: string, dentistaId: string) {
+    return this.http.get<any[]>(`${this.apiUrl}/atenciones`, {
+      params: {
+        fechaInicio: inicio,
+        fechaFin: fin,
+        dentistaId: dentistaId
+      }
+    });
   }
 }
 

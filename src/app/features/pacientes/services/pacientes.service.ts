@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { environment } from '../../../../environments/environment.development';
+import { environment } from '../../../../environments/environment';
 import { Paciente } from '../../../core/models/atencion.model';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 
 
@@ -17,8 +17,15 @@ export class PacientesService {
   // Signals para el estado
   public pacientes = signal<Paciente[]>([]);
   public filterQuery = signal<string>('');
+  public notification = signal<{message: string, show: boolean}>({ message: '', show: false });
 
 
+  showSuccess(msg: string) {
+    this.notification.set({ message: msg, show: true });
+    setTimeout(() => {
+      this.notification.set({ message: '', show: false });
+    }, 5000); // Se oculta tras 3 segundos
+  }
 
 // ✅ Lógica de filtrado inteligente (Computed)
   // Se recalcula automáticamente cuando cambia la lista o el texto de búsqueda
@@ -50,15 +57,19 @@ export class PacientesService {
    * Obtiene todos los pacientes desde NestJS
    * El backend debe retornar el objeto con: include: { user: true }
    */
-  findAll() {
-    return this.http.get<Paciente[]>(this.apiUrl).subscribe({
-      next: (data) => {
+  // Método limpio que retorna el flujo de datos
+  /**
+   * Obtiene todos los pacientes, actualiza el Signal global
+   * y sigue retornando el Observable para componentes como DailyView.
+   */
+  findAll(): Observable<Paciente[]> {
+    return this.http.get<Paciente[]>(this.apiUrl).pipe(
+      tap((data: Paciente[]) => {
+        // 🔥 Esto actualiza el Signal del servicio automáticamente
         this.pacientes.set(data);
-      },
-      error: (err) => {
-        console.error('Error al cargar pacientes en Sede Chillán:', err);
-      }
-    });
+        console.log('Signal global de pacientes actualizado desde el servicio');
+      })
+    );
   }
 
   /**
@@ -71,6 +82,24 @@ export class PacientesService {
 
   getById(id: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
+
+  create(patient: any): Observable<Paciente> {
+    return this.http.post<Paciente>(this.apiUrl, patient);
+  }
+
+  update(id: string, patientData: any): Observable<Paciente> {
+    return this.http.patch<Paciente>(`${this.apiUrl}/${id}`, patientData);
+  }
+
+  addPaciente(nuevo: Paciente) {
+    this.pacientes.update(lista => [nuevo, ...lista]);
+  }
+
+  updatePacienteInList(editado: Paciente) {
+    this.pacientes.update(lista =>
+      lista.map(p => p.id === editado.id ? editado : p)
+    );
   }
 
 }

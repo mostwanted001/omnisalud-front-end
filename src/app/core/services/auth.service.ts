@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,33 +10,44 @@ import { environment } from '../../../environments/environment.development';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-
-  // URL de tu NestJS (ajusta según tu environment)
   private apiUrl = `${environment.apiUrl}/auth`;
 
-  // Signal para manejar el estado global del usuario
-  public currentUser = signal<any>(null);
+  public currentUser = signal<any>(this.getInitialUser());
+
+  private getInitialUser(): any {
+    const data = localStorage.getItem('user_data');
+    return data ? JSON.parse(data) : null;
+  }
 
   login(credentials: { email: string; password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
       tap((res: any) => {
-        // Si el login es exitoso, guardamos el JWT para futuras peticiones
         if (res.access_token) {
           localStorage.setItem('token', res.access_token);
-          localStorage.setItem('user_role', res.user.role);
+          localStorage.setItem('user_data', JSON.stringify(res.user));
+          this.currentUser.set(res.user);
+          // Redirección genérica o basada en rol
+          this.router.navigate(['/dashboard']);
         }
-        this.router.navigate(['/agenda']);
       })
     );
   }
 
   logout() {
-    localStorage.removeItem('token');
+    localStorage.clear(); // 🔥 Borra todo de una vez
     this.currentUser.set(null);
     this.router.navigate(['/login']);
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('token');
+  // 🔥 NUEVO: Método genérico para obtener el ID de perfil (Doctor/Dentista/Esteticista)
+  getProfesionalId(): string | null {
+    const user = this.currentUser();
+    return user?.profileId || null;
   }
+
+  // 🔥 NUEVOS: Helpers de Rol (Útiles para esconder botones en el UI)
+  isDoctor() { return this.currentUser()?.role === 'DOCTOR'; }
+  isDentista() { return this.currentUser()?.role === 'DENTISTA'; }
+  isEsteticista() { return this.currentUser()?.role === 'ESTETICISTA'; }
+  isAdmin() { return this.currentUser()?.role === 'ADMIN'; }
 }
